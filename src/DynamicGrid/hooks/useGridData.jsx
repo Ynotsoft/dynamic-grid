@@ -150,7 +150,7 @@ export default function useGridData({
     setReverse((r) => !r);
   };
 
-  const pageSizes = useMemo(() => [20, 50, 100, 200, 500], []);
+  const pageSizes = useMemo(() => [20, 50, 75, 100], []);
 
   return {
     totalCount,
