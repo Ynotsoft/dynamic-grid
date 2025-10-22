@@ -11,6 +11,10 @@ export default {
     // Core React
     'react', 
     'react-dom',
+    'react-router',
+    
+    // Styling
+    'font-awesome/css/font-awesome.min.css',
     
     // Utilities
     'react-hot-toast',
@@ -24,6 +28,9 @@ export default {
     '@radix-ui/react-radio-group',
     '@radix-ui/react-select',
     '@radix-ui/react-separator',
+    '@radix-ui/react-dropdown-menu',
+    '@radix-ui/react-icons',
+    '@radix-ui/themes',
     
     // Date picker
     'react-day-picker',
@@ -46,7 +53,8 @@ export default {
     // Heroicons
     '@heroicons/react',
     '@heroicons/react/20/solid',
-    '@heroicons/react/24/outline'
+    '@heroicons/react/24/outline',
+
   ], // keep as peers
   jsx: 'automatic',           // transforms JSX with the new runtime
   esbuildOptions: (options) => {

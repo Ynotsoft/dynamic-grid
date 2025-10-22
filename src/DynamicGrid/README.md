@@ -21,8 +21,9 @@ The grid is composed of modular parts:
 
 ```jsx
 import Grid from "@/lib/DynamicGrid/Grid.jsx";
+import apiClient from "@/services/apiClient"; // Your axios instance
 
-<Grid apiUrl="admin/users" pageLength={20}>
+<Grid apiUrl="admin/users" apiClient={apiClient} pageLength={20}>
   <Grid.Column name="email">{(value) => <span>{value}</span>}</Grid.Column>
 
   <Grid.Action>
@@ -73,16 +74,17 @@ import Grid from "@/lib/DynamicGrid/Grid.jsx";
 
 ## ⚡ Props (Grid Component)
 
-| Prop               | Type        | Description                           |
-| ------------------ | ----------- | ------------------------------------- |
-| `apiUrl`           | `string`    | API endpoint for fetching data        |
-| `pageLength`       | `number`    | Rows per page (default: `15`)         |
-| `refresh`          | `boolean`   | Trigger grid refresh                  |
-| `setRefreshGrid`   | `function`  | Setter for refresh state              |
-| `headerButtons`    | `ReactNode` | Extra buttons displayed in the header |
-| `noRecordsMessage` | `string`    | Message when no results are found     |
-| `showExportButton` | `boolean`   | Show export CSV button (default: `false`) |
-| `persistFilters`   | `boolean`   | Persist filters across page navigation (default: `true`) |
+| Prop               | Type        | Required | Description                           |
+| ------------------ | ----------- | -------- | ------------------------------------- |
+| `apiUrl`           | `string`    | **Yes**  | API endpoint for fetching data        |
+| `apiClient`        | `object`    | **Yes**  | Axios instance or API client for HTTP requests |
+| `pageLength`       | `number`    | No       | Rows per page (default: `15`)         |
+| `refresh`          | `boolean`   | No       | Trigger grid refresh                  |
+| `setRefreshGrid`   | `function`  | No       | Setter for refresh state              |
+| `headerButtons`    | `ReactNode` | No       | Extra buttons displayed in the header |
+| `noRecordsMessage` | `string`    | No       | Message when no results are found     |
+| `showExportButton` | `boolean`   | No       | Show export CSV button (default: `false`) |
+| `persistFilters`   | `boolean`   | No       | Persist filters across page navigation (default: `true`) |
 
 ---
 

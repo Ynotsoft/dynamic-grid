@@ -1,12 +1,11 @@
 
-export { default as DynamicForm } from './DynamicForm/DynamicForm.jsx';
+export { default as DynamicGrid } from './DynamicGrid/Grid.jsx';
 
 // Default exports for backward compatibility
 
-import DynamicFormComponent from './DynamicForm/DynamicForm.jsx';
+// Export default as DynamicGrid (main component)
+import DynamicGridComponent from './DynamicGrid/Grid.jsx';
+export default DynamicGridComponent;
 
-// Export default as DynamicForm (main component)
-export default DynamicFormComponent;
-
-// Also export a default MyButton for direct import
-export { DynamicFormComponent };
+// Also export the component with an alias
+export { DynamicGridComponent };

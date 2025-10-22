@@ -1,7 +1,7 @@
 {
-  "name": "ynotsoft-dynamic-form",
-  "version": "1.0.14",
-  "description": "DynamicForm Component",
+  "name": "ynotsoft-dynamic-grid",
+  "version": "1.0.7",
+  "description": "DynamicGrid Component",
   "type": "module",
   "main": "dist/index.cjs",
   "module": "dist/index.js",
@@ -17,23 +17,23 @@
   ],
   "sideEffects": false,
   "peerDependencies": {
-    "react": "^18.2.0 || ^19.0.0",
-    "react-dom": "^18.2.0 || ^19.0.0",
-    "react-hot-toast": "^2.0.0",
-    "dayjs": "^1.11.0",
-    "dompurify": "^3.0.0",
+    "@emotion/react": "^11.0.0",
+    "@emotion/styled": "^11.0.0",
+    "@heroicons/react": "^2.0.0",
+    "@mui/material": "^5.0.0 || ^6.0.0 || ^7.0.0",
+    "@mui/x-date-pickers": "^6.0.0 || ^7.0.0 || ^8.0.0",
     "@radix-ui/react-label": "^2.0.0",
     "@radix-ui/react-popover": "^1.0.0",
     "@radix-ui/react-radio-group": "^1.0.0",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-separator": "^1.0.0",
+    "dayjs": "^1.11.0",
+    "dompurify": "^3.0.0",
+    "react": "^18.2.0 || ^19.0.0",
     "react-day-picker": "^8.0.0 || ^9.0.0",
-    "@mui/material": "^5.0.0 || ^6.0.0 || ^7.0.0",
-    "@mui/x-date-pickers": "^6.0.0 || ^7.0.0 || ^8.0.0",
-    "@emotion/react": "^11.0.0",
-    "@emotion/styled": "^11.0.0",
-    "react-select": "^5.0.0",
-    "@heroicons/react": "^2.0.0"
+    "react-dom": "^18.2.0 || ^19.0.0",
+    "react-hot-toast": "^2.0.0",
+    "react-select": "^5.0.0"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
@@ -51,5 +51,8 @@
   "keywords": [
     "react",
     "components"
-  ]
+  ],
+  "dependencies": {
+    "lucide-react": "^0.546.0"
+  }
 }
