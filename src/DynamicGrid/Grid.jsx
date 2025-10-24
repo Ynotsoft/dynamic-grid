@@ -1,4 +1,3 @@
-import "font-awesome/css/font-awesome.min.css";
 import { htmlMarkup } from "../utils/html_markup.jsx";
 import { FilterProvider } from "../context/FilterContext.jsx";
 
@@ -34,7 +33,14 @@ const GridContent = ({
   persistFilters = true, // Enable filter persistence by default
   rightSlot,
 }) => {
-  const grid = useGridData({ apiUrl, apiClient, pageLength, refresh, setRefreshGrid, persistFilters });
+  const grid = useGridData({
+    apiUrl,
+    apiClient,
+    pageLength,
+    refresh,
+    setRefreshGrid,
+    persistFilters,
+  });
   useActionFunctions(actionsFunctions);
 
   // NEW: imperative ref to control FilterMenu from chips
@@ -50,7 +56,7 @@ const GridContent = ({
       delete next[key];
       return next;
     });
-  }
+  };
 
   const onEditFilter = (key) => {
     filterMenuRef.current?.openForField?.(key);
