@@ -1,7 +1,9 @@
 # 🧩 DynamicGrid Documentation
 
-The `DynamicGrid` is a **React-based data grid system** built on Radix UI and TailwindCSS.
-It provides pagination, sorting, filtering, column visibility control, and now fully **frontend-defined dropdown actions** — all declaratively.
+`DynamicGrid` is a **React-based data grid** built on **Radix UI** and **TailwindCSS**.
+It provides **pagination**, **sorting**, **filtering**, and fully **frontend-defined dropdown actions** — all declaratively.
+
+> **Note:** The legacy **Column Manager / column visibility control** has been **removed** (see _Breaking Changes_).
 
 ---
 
@@ -10,87 +12,115 @@ It provides pagination, sorting, filtering, column visibility control, and now f
 The grid is composed of modular parts:
 
 - **`Grid`** – Orchestrates data fetching, sorting, pagination, and rendering.
-- **`Grid.Column`** – Defines how each column’s cell is rendered.
-- **`Grid.Action`** – Defines contextual dropdown actions or menus (frontend-only).
-- **`DataTable`** – The table engine that powers sorting, display, and layout.
-- **`FilterMenu`** – Adds advanced filtering options.
+- **`Grid.Column`** – Declarative column cell rendering (value + full record).
+- **`Grid.Action`** – Contextual dropdown actions (frontend-only).
+- **`DataTable`** – Table engine for layout & sort UI.
+- **`FilterMenu`** – Advanced filtering UI (popover).
+- **`ActiveFilterChips`** – Displays active filters and now supports **click-to-edit**.
 
 ---
 
-## 🚀 Basic Usage
+## 📦 Installation
+
+This library is UI-headless + Radix/Tailwind friendly. Ensure peers are installed in your host app.
+
+```bash
+# bun / npm / pnpm — pick one
+bun add @radix-ui/react-dropdown-menu @radix-ui/react-popover @radix-ui/react-label
+bun add tailwindcss clsx
+# your axios (or compatible) client
+bun add axios
+# then install your grid package (adjust name if different in package.json)
+bun add ynotsoft-dynamic-grid
+```
+
+**Peer assumptions**
+
+- React 18+ (tested on React 19)
+- TailwindCSS present and configured
+- Radix UI primitives available (DropdownMenu, Popover, Label)
+- An HTTP client (axios or compatible) if using `apiUrl + apiClient`
+
+---
+
+## 🚀 Quick Start
 
 ```jsx
 import Grid from "@/lib/DynamicGrid/Grid.jsx";
-import apiClient from "@/services/apiClient"; // Your axios instance
+import apiClient from "@/services/apiClient";
 
-<Grid apiUrl="admin/users" apiClient={apiClient} pageLength={20}>
-  <Grid.Column name="email">{(value) => <span>{value}</span>}</Grid.Column>
+export default function UsersGrid() {
+  return (
+    <Grid apiUrl="admin/users" apiClient={apiClient} pageLength={20}>
+      <Grid.Column name="email">{(value) => <span>{value}</span>}</Grid.Column>
 
-  <Grid.Action>
-    {(record, { getIcon, intentClasses, RightSlot }) => {
-      const ViewIcon = getIcon?.("view");
-
-      return (
-        <>
-          <DropdownMenu.Label className={intentClasses(undefined, "label")}>
-            Quick actions
-          </DropdownMenu.Label>
-          <DropdownMenu.Separator
-            className={intentClasses(undefined, "separator")}
-          />
-
-          <DropdownMenu.Item
-            className={intentClasses("success")}
-            onSelect={(e) => {
-              e.preventDefault();
-              navigate(`/admin/users/${record.id}`);
-            }}
-          >
-            {ViewIcon && (
-              <ViewIcon
-                className={intentClasses("success", "icon")}
-                aria-hidden
+      <Grid.Action>
+        {(record, { getIcon, intentClasses, RightSlot }) => {
+          const ViewIcon = getIcon?.("view");
+          return (
+            <>
+              <DropdownMenu.Label className={intentClasses(undefined, "label")}>
+                Quick actions
+              </DropdownMenu.Label>
+              <DropdownMenu.Separator
+                className={intentClasses(undefined, "separator")}
               />
-            )}
-            <span>View</span>
-            <RightSlot>⌘V</RightSlot>
-          </DropdownMenu.Item>
-        </>
-      );
-    }}
-  </Grid.Action>
-</Grid>;
+
+              <DropdownMenu.Item
+                className={intentClasses("success")}
+                onSelect={(e) => {
+                  e.preventDefault();
+                  navigate(`/admin/users/${record.id}`);
+                }}
+              >
+                {ViewIcon && (
+                  <ViewIcon
+                    className={intentClasses("success", "icon")}
+                    aria-hidden
+                  />
+                )}
+                <span>View</span>
+                <RightSlot>⌘V</RightSlot>
+              </DropdownMenu.Item>
+            </>
+          );
+        }}
+      </Grid.Action>
+    </Grid>
+  );
+}
 ```
 
 ✅ **Automatic Features**
 
-- Data loading via `apiUrl`
-- Sorting, pagination, and column control
-- Integrated Radix UI dropdowns
-- Context-aware theming (`intentClasses`)
-- The Actions column only appears when `<Grid.Action>` is defined
+- Data loading via `apiUrl + apiClient`
+- Sorting, pagination, and filter UI/logic
+- Integrated Radix dropdown actions
+- Context-aware theming via `intentClasses`
+- **Actions column appears only when** `<Grid.Action>` exists
 
 ---
 
-## ⚡ Props (Grid Component)
+## ⚡ `Grid` Props
 
-| Prop               | Type        | Required | Description                           |
-| ------------------ | ----------- | -------- | ------------------------------------- |
-| `apiUrl`           | `string`    | **Yes**  | API endpoint for fetching data        |
-| `apiClient`        | `object`    | **Yes**  | Axios instance or API client for HTTP requests |
-| `pageLength`       | `number`    | No       | Rows per page (default: `15`)         |
-| `refresh`          | `boolean`   | No       | Trigger grid refresh                  |
-| `setRefreshGrid`   | `function`  | No       | Setter for refresh state              |
-| `headerButtons`    | `ReactNode` | No       | Extra buttons displayed in the header |
-| `noRecordsMessage` | `string`    | No       | Message when no results are found     |
-| `showExportButton` | `boolean`   | No       | Show export CSV button (default: `false`) |
-| `persistFilters`   | `boolean`   | No       | Persist filters across page navigation (default: `true`) |
+| Prop               | Type        | Required | Description                                          |
+| ------------------ | ----------- | -------: | ---------------------------------------------------- |
+| `apiUrl`           | `string`    |  **Yes** | API endpoint path for fetching data.                 |
+| `apiClient`        | `object`    |  **Yes** | Axios instance or compatible HTTP client.            |
+| `pageLength`       | `number`    |       No | Rows per page (default: `15`).                       |
+| `refresh`          | `boolean`   |       No | Toggle to trigger a data refresh.                    |
+| `setRefreshGrid`   | `function`  |       No | Setter for `refresh`.                                |
+| `headerButtons`    | `ReactNode` |       No | Extra header actions (e.g., “Create”).               |
+| `noRecordsMessage` | `string`    |       No | Message when no rows.                                |
+| `showExportButton` | `boolean`   |       No | Show Export CSV button (default: `false`).           |
+| `persistFilters`   | `boolean`   |       No | Persist filters across navigation (default: `true`). |
+
+**Server-side contract** (expected query params):
+Your `apiClient` should send `page`, `pageLength`, `sort` (e.g., `field:asc|desc`), and a serialised `filter` payload. Return JSON `{ data: any[], total: number }`.
 
 ---
 
 ## 📊 Defining Columns
-
-Columns are declared using `<Grid.Column>` and receive both the raw value and the full record.
 
 ```jsx
 <Grid.Column name="UserName">
@@ -102,43 +132,27 @@ Columns are declared using `<Grid.Column>` and receive both the raw value and th
 </Grid.Column>
 ```
 
-**Parameters:**
+**Renderer parameters**
 
-- `value` → cell value
-- `record` → entire row object
-
----
-
-## 🎯 Custom Actions (`Grid.Action`)
-
-The grid no longer supports **API-defined actions**.
-You must define them yourself via `<Grid.Action>`.
-
-The grid automatically detects whether a `<Grid.Action>` exists:
-
-- ✅ If defined, the **Actions column** is rendered.
-- 🚫 If not, the column is omitted entirely.
+- `value` — the field value of the column
+- `record` — full row object
 
 ---
 
-### ⚙️ How It Works
+## 🎯 Custom Actions (`<Grid.Action>`)
 
-- The `showActions` prop has been **removed**.
-- Backend-driven actions (e.g., `record.actions`) are **ignored**.
-- All menu items, icons, and interactions are now handled **entirely client-side**.
+Backend-driven actions are **removed**. Define actions client-side:
 
----
+- If `<Grid.Action>` exists → **Actions column is rendered**.
+- If not → **Actions column is omitted**.
 
-### 🧱 Default Dropdown Menu Example
-
-This example uses Radix UI’s dropdown system and integrates with the internal grid theme.
+### Example (Radix Dropdown)
 
 ```jsx
 <Grid.Action>
   {(record, { getIcon, intentClasses, RightSlot }) => {
     const EditIcon = getIcon?.("edit");
     const TrashIcon = getIcon?.("delete");
-
     return (
       <>
         <DropdownMenu.Label className={intentClasses(undefined, "label")}>
@@ -148,7 +162,6 @@ This example uses Radix UI’s dropdown system and integrates with the internal 
           className={intentClasses(undefined, "separator")}
         />
 
-        {/* Edit */}
         <DropdownMenu.Item
           className={intentClasses("success")}
           onSelect={(e) => {
@@ -166,7 +179,6 @@ This example uses Radix UI’s dropdown system and integrates with the internal 
           <RightSlot>⌘E</RightSlot>
         </DropdownMenu.Item>
 
-        {/* Delete */}
         <DropdownMenu.Item
           className={intentClasses("danger")}
           onSelect={(e) => {
@@ -189,287 +201,149 @@ This example uses Radix UI’s dropdown system and integrates with the internal 
 </Grid.Action>
 ```
 
-💡 **Key Notes:**
-
-- `intentClasses("success")` and `intentClasses("danger")` handle hover and highlight tones.
-- `RightSlot` right-aligns hint text or shortcut keys.
-- `getIcon()` retrieves icons from the internal Radix IconMap.
-
 ---
 
-### 🎨 Fully Custom Menu (Overriding Style)
+## 🎨 Theming Utilities
 
-You can override all theme styling and define your own dropdown layout entirely:
+**`intentClasses(intent?, part?)`**
+Consistent Tailwind tone classes for menu parts.
 
-```jsx
-<Grid.Action>
-  {(record) => (
-    <div className="flex flex-col p-2">
-      <button
-        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-indigo-700 hover:bg-indigo-600 hover:text-white"
-        onClick={() => viewDetails(record)}
-      >
-        <EyeOpenIcon className="h-4 w-4" />
-        View Details
-      </button>
+| Param    | Values                                                         |
+| -------- | -------------------------------------------------------------- |
+| `intent` | `"success"`, `"danger"`, `"warning"`, `"default"` _(optional)_ |
+| `part`   | `"item"`, `"icon"`, `"label"`, `"separator"`                   |
 
-      <button
-        className="flex items-center gap-2 rounded-md px-2 py-1.5 text-red-600 hover:bg-red-600 hover:text-white"
-        onClick={() => deleteRecord(record.id)}
-      >
-        <TrashIcon className="h-4 w-4" />
-        Delete
-      </button>
-    </div>
-  )}
-</Grid.Action>
-```
-
----
-
-## 🧠 Theming Utilities
-
-### `intentClasses(intent, part)`
-
-Dynamic helper for consistent intent-based styling.
-
-| Parameter | Description                                                  |
-| --------- | ------------------------------------------------------------ |
-| `intent`  | `"success"`, `"danger"`, `"warning"`, `"default"` (optional) |
-| `part`    | `"item"`, `"icon"`, `"label"`, `"separator"`                 |
-
-#### Example:
-
-```jsx
-<DropdownMenu.Item className={intentClasses("danger")}>
-  <TrashIcon className={intentClasses("danger", "icon")} />
-  <span>Delete</span>
-</DropdownMenu.Item>
-```
-
-Calling `intentClasses()` with **no args** defaults to neutral styling.
-
----
-
-## 🧩 The `theme` Object (Injected into `<Grid.Action>`)
-
-When you define a custom `<Grid.Action>`, your callback receives a `theme` helper:
-
-| Property        | Type        | Description                                |
-| --------------- | ----------- | ------------------------------------------ |
-| `intentClasses` | `function`  | Applies consistent tone-based styles       |
-| `getIcon`       | `function`  | Fetches a Radix UI icon from the `IconMap` |
-| `RightSlot`     | `component` | Renders aligned hint text                  |
+**`getIcon(key)`** → Returns a Radix icon from your `IconMap`.
+**`RightSlot`** → Right-aligned hint (e.g., shortcut key).
 
 ---
 
 ## 🔣 Icon Mapping
 
-The internal `IconMap` connects common action names to Radix UI icons.
-You can extend or modify this in `IconMap.js`.
-
-| Key        | Icon                  | 💡 Use            |
-| ---------- | --------------------- | ----------------- |
-| `edit`     | `Pencil1Icon`         | ✏️ Edit or modify |
-| `view`     | `EyeOpenIcon`         | 👁️ View details   |
-| `delete`   | `TrashIcon`           | 🗑️ Delete item    |
-| `menu`     | `DotsHorizontalIcon`  | ⋯ More options    |
-| `settings` | `GearIcon`            | ⚙️ Settings       |
-| `user`     | `PersonIcon`          | 👤 User info      |
-| `download` | `DownloadIcon`        | ⬇️ Download       |
-| `upload`   | `UploadIcon`          | ⬆️ Upload         |
-| `copy`     | `CopyIcon`            | 📋 Copy data      |
-| `refresh`  | `ReloadIcon`          | 🔄 Refresh data   |
-| `lock`     | `LockClosedIcon`      | 🔒 Lock item      |
-| `unlock`   | `LockOpen1Icon`       | 🔓 Unlock item    |
-| `approve`  | `CheckIcon`           | ✅ Approve        |
-| `reject`   | `Cross2Icon`          | ❌ Reject         |
-| `search`   | `MagnifyingGlassIcon` | 🔍 Search         |
-
-🧠 **How it works:**
-
-```jsx
-<Grid.Action>
-  {(record, { getIcon }) => {
-    const EditIcon = getIcon?.("edit");
-    const ViewIcon = getIcon?.("view");
-
-    return (
-      <>
-        {EditIcon && <EditIcon className="h-4 w-4 text-green-600" />}
-        {ViewIcon && <ViewIcon className="h-4 w-4 text-blue-600" />}
-      </>
-    );
-  }}
-</Grid.Action>
-```
-
-To define a local icon, just import and call it directly —
-`getIcon()` is purely for mapped shorthand keys.
+Your internal `IconMap` connects action names → Radix icons (e.g., `view`, `edit`, `delete`, `copy`, `refresh`, etc.).
+Import custom icons directly if you don’t want to use the map.
 
 ---
 
-## 🧩 Theme Object (Injected into Custom Actions)
+## 🔍 Filters & Search
 
-Every `Grid.Action` automatically receives a `theme` object:
-
-| Property        | Type        | Description                                   |
-| --------------- | ----------- | --------------------------------------------- |
-| `intentClasses` | `function`  | Style generator for dropdown tones            |
-| `getIcon`       | `function`  | Fetches icons from the internal IconMap       |
-| `RightSlot`     | `ReactNode` | Right-aligned hint (e.g., keyboard shortcuts) |
-
-Example:
-
-```jsx
-const { getIcon, intentClasses, RightSlot } = theme;
-```
-
----
-
-## 🔍 Filters and Search
-
-DynamicGrid supports client-side filtering with an accessible popover filter menu and interactive chips.
+DynamicGrid supports client-side filtering with a11y popover and **interactive chips**.
 
 ```jsx
 <FilterMenu searchForm={list.searchForm} setFilter={setFilter} filter={filter} />
-<ActiveFilterChips filter={filter} onRemove={removeFilter} onClear={() => setFilter({})} />
+<ActiveFilterChips
+  filter={filter}
+  onRemove={removeFilter}
+  onClear={() => setFilter({})}
+/>
 ```
 
----
+### Click-to-edit Chips (New)
 
-## Filter editing via ActiveFilterChips
+- Click / Enter / Space on a chip → opens editor for that field.
+- **Autofocus**: value input (text) or first checkbox (multi-select).
+- **No backend calls**: filtering is client-side on the current dataset.
 
-**New, streamlined editing flow**: users can now click an active filter chip to edit that filter directly.
+**Imperative API (FilterMenu)**
 
-### What’s new
+- `open()` – open the popover
+- `close()` – close & reset internal editor state
+- `openForField(key)` – open and jump straight to the field; autofocus value
 
-- **Click-to-edit chips**: `ActiveFilterChips` makes each chip a keyboard-accessible control (click, Enter, or Space) that opens the filter editor for that field.
-- **Autofocus on value**: When opened from a chip, the `FilterMenu` focuses the **Value** input immediately for text fields, or the **first checkbox** for checkbox groups.
-- **No backend calls**: All filtering remains purely client-side based on the current list response.
-
-### Developer details
-
-- `FilterMenu` now exposes an **imperative API** via `forwardRef` / `useImperativeHandle`:
-
-  - `open()` — open the popover
-  - `close()` — close and reset internal editor state
-  - `openForField(key)` — open and jump straight to the editor for the given field, with autofocus on the value input/first checkbox
-
-- `ActiveFilterChips` now accepts an optional `onEdit(key)` callback. Chips call this when the user clicks or presses Enter/Space.
-- In `Grid`, we create a `filterMenuRef` and wire chips to `filterMenuRef.current.openForField(key)`.
-- The “remove (X)” icon on a chip calls `stopPropagation()` so removing a rule doesn’t accidentally trigger editing.
-- Accessibility: proper ARIA roles/labels; arrow-key navigation in field list; `Enter` applies; `Ctrl/Cmd+Enter` applies from anywhere; `Esc` closes.
-
-### Minimal integration example
+**Integration sketch**
 
 ```jsx
-// in Grid.js
 const filterMenuRef = useRef(null);
 
 <ActiveFilterChips
   filter={grid.filter}
   onRemove={removeFilter}
-  onEdit={(key) => filterMenuRef.current?.openForField(key)} // ← new
+  onEdit={(key) => filterMenuRef.current?.openForField(key)}
 />
 
-<GridHeader
-  /* ...other props... */
-  filterMenuRef={filterMenuRef} // ← pass ref down to FilterMenu
-/>
+<GridHeader filterMenuRef={filterMenuRef} />
 ```
 
 ---
 
-## 💾 Filter Persistence Across Navigation
+## 💾 Filter Persistence (Per-Grid)
 
-**New Feature**: Filters are now automatically persisted across page navigation using React Context!
+When `persistFilters` is `true` (default):
 
-By default, when you apply filters to a grid and navigate to another page, your filters will be restored when you return to that page.
+- Each grid is keyed by `apiUrl`.
+- Filters + field definitions (searchForm) are stored in `FilterContext`.
+- Navigating away and back restores state for that grid.
+- Persistence is session-scoped (clears on reload).
+  To persist across sessions, adapt `FilterContext` to use `localStorage`.
 
-### How It Works
-
-- Each grid is identified by its `apiUrl` prop
-- Filters are stored in the `FilterContext` with the `apiUrl` as the key
-- When you navigate away and come back, the grid automatically restores the filters
-- Each grid maintains its own independent filter state
-
-### Usage
-
-**Enable persistence (default behavior):**
-```jsx
-<Grid apiUrl="admin/users" persistFilters={true}>
-  {/* ... */}
-</Grid>
-```
-
-**Disable persistence for a specific grid:**
-```jsx
-<Grid apiUrl="admin/users" persistFilters={false}>
-  {/* ... */}
-</Grid>
-```
-
-### Example Scenario
-
-1. User navigates to `/admin/users`
-2. User applies filters: `Status = Active`, `Role = Admin`
-3. User navigates to `/admin/companies`
-4. User navigates back to `/admin/users`
-5. ✅ Filters are automatically restored: `Status = Active`, `Role = Admin`
-
-### Technical Details
-
-- Filter state is managed by `FilterContext` in `src/context/FilterContext.js`
-- The context stores both filters and searchForm (field definitions) per grid:
-  - Filters: `{ "admin/users": {...filters}, "admin/companies": {...filters} }`
-  - SearchForms: `{ "admin/users": {...fieldDefs}, "admin/companies": {...fieldDefs} }`
-- **SearchForm persistence ensures all filter field options remain available** when navigating between pages
-- Filters persist for the session (cleared on page refresh)
-- To implement persistent storage across sessions, modify `FilterContext` to use `localStorage`
-
-### Clear All Filters
-
-To programmatically clear filters for a specific grid:
+**Programmatically clear filters**
 
 ```jsx
 import { useFilter } from "@/context/FilterContext";
-
 const { clearFilter } = useFilter();
-
-// Clear filters for a specific grid
 clearFilter("admin/users");
 ```
 
 ---
 
-## Breaking Changes
+## ⌨️ Accessibility & Keyboard Support
 
-- **Filter editing API surfaced via imperative ref**:
-  `FilterMenu` is now `forwardRef`-based with `openForField(key)`.
-  If you previously tried to control the menu without a ref, update your integration to pass a `filterMenuRef` into `GridHeader` → `FilterMenu`, and trigger `openForField(key)` from chip clicks or other UI.
-  The chip remove button also uses `stopPropagation()` to avoid unintentionally opening the editor.
+- Proper roles on menus & items (Radix primitives).
+- Chip controls are keyboard-accessible (Enter/Space).
+- Filter field list supports arrow navigation; `Enter` applies; `Esc` closes; `Ctrl/Cmd+Enter` applies from anywhere.
+- Focus ring visible; popovers preserve focus on value where possible.
 
 ---
 
-## Change History
+## 🧠 Imperative Hooks Summary
+
+- `FilterMenu` via `ref`: `open()`, `close()`, `openForField(key)`
+- `Grid` exposes controlled props for page/sort/filter if you need URL-driven state (advanced pattern).
+
+---
+
+## 🧪 Error / Empty / Loading States
+
+- Empty state rendered when `data.length === 0` after a resolved request.
+- Loading spinners/skeletons rendered while fetching.
+- Error message area (pass a string or node through `error` if you extend `Grid`).
+
+---
+
+## 🛠 Troubleshooting
+
+- **Menu closes while typing in search**
+  Ensure the popover isn’t re-mounting on each keystroke. Keep the menu mounted and debounce (`250ms`) search input.
+
+- **Input loses focus on every keypress**
+  Avoid resetting entire `searchForm` or `filter` objects each render. Update field-level state immutably and memoise menu sections.
+
+- **Table overflows page**
+  Wrap the grid in a container with bounded height and `overflow-auto`; avoid letting the table dictate page height on large datasets.
+
+- **Actions column missing**
+  It only renders if `<Grid.Action>` is present.
+
+---
+
+## 🔄 Breaking Changes
+
+- **Backend-defined actions** → **Removed.** Use `<Grid.Action>`.
+- **`showActions` prop** → **Removed.** Grid auto-detects `<Grid.Action>`.
+- **Column Manager / Visibility control** → **Removed.**
+- **Inline quick buttons** → Removed in favour of consistent dropdown menus.
+- **Theme injection** → Unified helpers now passed into `Grid.Action` (`intentClasses`, `getIcon`, `RightSlot`).
+
+---
+
+## 🗓 Change History
 
 ### 2025-10-16
 
-- **ActiveFilterChips → click to edit** the selected field; keyboard-accessible (Enter/Space).
-- **FilterMenu → `openForField(key)`** to open targeted field with **autofocus on value**.
-- Improved a11y: arrow-key field navigation, `Enter` to apply, `Esc` to close, `Ctrl/Cmd+Enter` apply from anywhere.
-- No changes to backend behaviour; filtering remains **client-side**.
-
----
-
-✅ **Summary:**
-Users can now directly **click an active filter chip** to reopen and edit that specific filter field.
-The menu **autofocuses the value input** for quick editing, maintaining a smooth and accessible client-side filtering workflow.
-
----
-
-Would you like me to also add a small **visual diagram** (Flow: _Chip click → FilterMenu open → Value focus → Apply → Grid refresh_) to this README to illustrate the new interaction?
+- **ActiveFilterChips → click to edit** with keyboard support.
+- **FilterMenu → `openForField(key)`** with autofocus on the value input / first checkbox.
+- A11y improvements: arrow navigation, `Enter` apply, `Esc` close, `Ctrl/Cmd+Enter` global apply.
+- Filtering remains **client-side**.
 
 ---
 
@@ -480,53 +354,37 @@ DynamicGrid/
 │
 ├── Grid.js                  # Core wrapper
 ├── components/
-│   ├── DataTable.js         # Renders table body and actions
-│   ├── GridHeader.js        # Grid header + buttons + filters
-│   ├── ActiveFilterChips.js # Display active filters
-│   ├── FilterMenu.js        # Filter menu dropdown
-│   ├── IconMap.js           # Icon registry (Radix UI)
+│   ├── DataTable.js         # Table body + header glue
+│   ├── GridHeader.js        # Header + buttons + filters
+│   ├── ActiveFilterChips.js # Active filters with click-to-edit
+│   ├── FilterMenu.js        # Popover editor (imperative API)
+│   ├── IconMap.js           # Icon registry for actions
+│
+├── context/
+│   └── FilterContext.js     # Per-apiUrl persistence (session)
 │
 ├── hooks/
-│   ├── useGridData.js       # Fetches and normalises data
-│   ├── useActionFunctions.js
+│   ├── useGridData.js       # Fetch + normalise
+│   └── useActionFunctions.js
 │
 └── utils/
-    └── html_markup.js       # Safe markup rendering helper
+    └── html_markup.js       # Safe markup helper
 ```
 
 ---
 
-## 🧭 Developer Notes
+## 🧭 Roadmap (opinionated priorities)
 
-- `showActions` is **deprecated** — the grid auto-detects if `<Grid.Action>` exists.
-- `record.actions` (from API) is **no longer supported**.
-- To style consistently, always use `intentClasses()` instead of hardcoded classes.
-- Icons can be sourced from your Radix `IconMap` or imported manually.
-- The Actions column will only render when a `<Grid.Action>` is defined.
-
----
-
-## 🚨 Breaking Changes (vNext)
-
-| Area                     | Previous Behaviour                                                  | New Behaviour                                                                                        |
-| ------------------------ | ------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| **Actions**              | Automatically generated from `record.actions` in API response       | Must be defined via `<Grid.Action>` manually                                                         |
-| **showActions prop**     | Controlled whether to display the Actions column                    | Deprecated — grid auto-detects `<Grid.Action>`                                                       |
-| **Backend coupling**     | Required server-defined action schema (`func_name`, `intent`, etc.) | Frontend-only; API no longer dictates UI logic                                                       |
-| **Default dropdown**     | Rendered automatically when backend provided `actions`              | Removed — you must define your dropdown manually                                                     |
-| **Theme injection**      | Partial                                                             | Full theme helpers (`intentClasses`, `getIcon`, `RightSlot`) now passed to your custom `Grid.Action` |
-| **Inline quick buttons** | Supported in old versions                                           | Removed for visual consistency; dropdowns only                                                       |
-| **Column Manager**       | Controls table column display                                       | Removed Functionality                                                                                |
+1. **Column visibility** (bring back minimally, client-only)
+2. **CSV export** with current filters/sort
+3. URL-synced state (page/sort/filter) helper for deep-links
+4. Batch row selection + toolbar actions
+5. Virtualised rows (optional adapter) for very large lists
+6. Column resize with min/max
+7. Multi-sort (Shift+click headers) with badges in toolbar
 
 ---
 
-✅ **Migration Notes**
+## Licence
 
-1. Remove any backend logic populating `record.actions`.
-2. Remove all references to `showActions`.
-3. Add a `<Grid.Action>` block for every grid needing actions.
-4. Use `intentClasses()` and `getIcon()` for consistent styling.
-5. Your data-fetching (`apiUrl`) and grid logic remain unchanged.
-6. Remove any instance/declarations of ColumnManager.
-
----
+MIT © YNOT Software
