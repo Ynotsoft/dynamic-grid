@@ -29,6 +29,8 @@ export default {
     "dompurify",
     "js-cookie",
     "lucide-react",
+    "react-router",
+    "react-router-dom",
   ],
 
   jsx: "automatic",
