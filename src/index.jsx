@@ -1,3 +1,4 @@
+import './styles.css';
 
 export { default as DynamicGrid } from './DynamicGrid/Grid.jsx';
 
