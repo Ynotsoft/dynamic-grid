@@ -70,7 +70,7 @@ const GridContent = ({
   ];
 
   return (
-    <div className="mx-auto w-full max-w-full bg-white ">
+    <div className=" ">
       <GridHeader
         isLoading={grid.isLoading}
         searchForm={grid.searchForm}

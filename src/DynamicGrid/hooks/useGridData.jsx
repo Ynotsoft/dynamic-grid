@@ -19,7 +19,6 @@ export default function useGridData({
   }
 
   const { getFilter, setGridFilter, getSearchForm, setGridSearchForm } = useFilter();
-  console.log("getFilter:", getFilter, "setGridFilter:", setGridFilter, "getSearchForm:", getSearchForm, "setGridSearchForm:", setGridSearchForm);
   const [totalCount, setTotalCount] = useState(0);
   const [pageIndex, setPageIndex] = useState(1);
   const [sortKey, setSortKey] = useState("");
@@ -87,7 +86,7 @@ export default function useGridData({
       setIsLoading(true);
       setNumberOfRecords(num);
       const res = await apiClient.post(
-        `api/${apiUrl}?page=${pageIndex}&page_size=${num}&sort_key=${sortKey}&sort_order=${sortOrder}`,
+        `${apiUrl}?page=${pageIndex}&page_size=${num}&sort_key=${sortKey}&sort_order=${sortOrder}`,
         params,
       );
       const data = normalise(res);

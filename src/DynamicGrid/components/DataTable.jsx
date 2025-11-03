@@ -4,7 +4,18 @@ import { IconButton, Table } from "@radix-ui/themes";
 import { DotsVerticalIcon } from "@radix-ui/react-icons";
 import TableSkeleton from "./TableSkeleton.jsx";
 import { getActionIcon } from "./IconMap.jsx";
-import { useNavigate } from "react-router";
+
+// Safe hook to use navigation only when router is available
+function useSafeNavigate() {
+  try {
+    // Only import useNavigate if react-router is available
+    const { useNavigate } = require("react-router");
+    return useNavigate();
+  } catch {
+    // Return a no-op function if react-router is not available
+    return () => {};
+  }
+}
 
 export default function DataTable({
   isLoading,
@@ -18,7 +29,7 @@ export default function DataTable({
   actionRenderer, // optional: if omitted, fallback default actions are used
   noRecordsMessage,
 }) {
-  const navigate = useNavigate();
+  const navigate = useSafeNavigate();
 
   // ---------- Theme (scoped to Grid/DataTable) ----------
   function intentClasses(intent, part = "item") {
