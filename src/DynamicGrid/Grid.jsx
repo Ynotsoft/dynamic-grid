@@ -2,7 +2,6 @@ import { htmlMarkup } from "../utils/html_markup.jsx";
 import { FilterProvider } from "../context/FilterContext.jsx";
 
 import useGridData from "./hooks/useGridData.jsx";
-import useActionFunctions from "./hooks/useActionFunctions.jsx";
 
 // renamed parts -> descriptive components
 import GridHeader from "./components/GridHeader.jsx";
@@ -22,8 +21,6 @@ const GridContent = ({
   apiUrl,
   apiClient,
   pageLength = 15,
-  showActions,
-  actionsFunctions,
   refresh,
   setRefreshGrid,
   noRecordsMessage,
@@ -41,7 +38,6 @@ const GridContent = ({
     setRefreshGrid,
     persistFilters,
   });
-  useActionFunctions(actionsFunctions);
 
   // NEW: imperative ref to control FilterMenu from chips
   const filterMenuRef = useRef(null);
