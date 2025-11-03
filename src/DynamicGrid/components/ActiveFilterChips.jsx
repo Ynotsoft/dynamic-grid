@@ -4,7 +4,6 @@ import {
   Badge,
   IconButton,
   Button,
-  Tooltip,
   ScrollArea,
 } from "@radix-ui/themes";
 import { X, Filter } from "lucide-react";
@@ -175,8 +174,6 @@ export default function ActiveFilterChips({
                   >
                     {valueLabel}
                   </span>
-
-                  <Tooltip content="Remove filter">
                     <IconButton
                       size="1"
                       variant="ghost"
@@ -191,7 +188,6 @@ export default function ActiveFilterChips({
                     >
                       <X size={14} />
                     </IconButton>
-                  </Tooltip>
                 </Flex>
               </Badge>
             );
@@ -200,12 +196,10 @@ export default function ActiveFilterChips({
       </ScrollArea>
 
       {typeof onClear === "function" && (
-        <Tooltip content="Clear all filters">
           <Button variant="soft" color="gray" size="2" onClick={onClear}>
             <Filter size={16} style={{ marginRight: 6 }} />
             Clear all
           </Button>
-        </Tooltip>
       )}
     </Flex>
   );
