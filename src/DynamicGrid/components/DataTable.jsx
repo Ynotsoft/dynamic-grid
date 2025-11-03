@@ -28,7 +28,7 @@ export default function DataTable({
           <TableSkeleton rows={1} columns={4} />
         ) : (
           <Table.Header>
-            <Table.Row align="center">
+            <Table.Row align="top">
               {filterHeader?.map(
                 (header) =>
                   header.display && (
@@ -53,7 +53,9 @@ export default function DataTable({
               )}
 
               {showActionsColumn && (
-                <Table.ColumnHeaderCell className="sticky w-10 shrink px-2 py-4 text-left text-sm font-semibold uppercase text-gray-700" />
+                <Table.ColumnHeaderCell className="sticky w-10 shrink px-2 py-4 text-left text-sm font-semibold uppercase text-gray-700" >
+                  Actions
+                </Table.ColumnHeaderCell>
               )}
             </Table.Row>
           </Table.Header>
