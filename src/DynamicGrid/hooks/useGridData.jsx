@@ -80,14 +80,14 @@ export default function useGridData({
   };
 
   const getList = async (num = numberOfRecords) => {
-    const params = { filter, headers: filterHeader };
+    const params = { filter };
 
     try {
       setIsLoading(true);
       setNumberOfRecords(num);
       const res = await apiClient.post(
         `${apiUrl}?page=${pageIndex}&page_size=${num}&sort_key=${sortKey}&sort_order=${sortOrder}`,
-        params,
+        params
       );
       const data = normalise(res);
 
@@ -125,7 +125,7 @@ export default function useGridData({
   }, [filter, sortKey, reverse]);
 
   const exportList = async () => {
-    const params = { filter, headers: filterHeader };
+    const params = { filter };
     try {
       setIsExporting(true);
       const res = await apiClient.post(`api/${apiUrl}?export=csv`, params);
