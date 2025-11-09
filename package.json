@@ -1,6 +1,6 @@
 {
   "name": "ynotsoft-dynamic-grid",
-  "version": "1.0.14",
+  "version": "1.0.15",
   "description": "DynamicGrid Component",
   "type": "module",
   "main": "dist/index.cjs",
@@ -75,3 +75,4 @@
     "js-cookie": "^3.0.5"
   }
 }
+
