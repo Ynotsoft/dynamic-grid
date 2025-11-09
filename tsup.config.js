@@ -8,7 +8,7 @@ export default {
   minify: true,
   dts: false,
 
-  injectStyle: true, 
+  injectStyle: false,
   external: [
     "react",
     "react-dom",

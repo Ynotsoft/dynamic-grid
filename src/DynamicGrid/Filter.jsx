@@ -1,0 +1,246 @@
+import React, { useState } from 'react';
+
+function GridMenu({ list, setFilter, filter }) {
+  const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
+  const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
+  const [selectedFilter, setSelectedFilter] = useState(null);
+  const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
+  const [localOperator, setLocalOperator] = useState('');
+  const [localValue, setLocalValue] = useState('');
+  const [error, setError] = useState('');
+
+  const searchForm = list?.filters || {};
+  const textFieldOperators = [
+    { title: 'contains' },
+    { title: 'equals' },
+    { title: 'starts with' }
+  ];
+
+  const handleMainMenuClick = (header) => {
+    const filter = searchForm[header];
+    setSelectedFilter({ header, type: filter.type });
+
+    // Set initial values based on field type
+    if (filter.type === 'TextField') {
+      setLocalOperator(textFieldOperators[0].title); // Set to first option
+      setLocalValue(''); // Reset local value
+    } else if (filter.type === 'CheckBoxGroup') {
+      setSelectedCheckboxes([]); // Reset checkboxes
+    }
+    setIsSubMenuOpen(true);
+  };
+
+  const handleClick = () => {
+  
+    if (selectedFilter && selectedFilter.header) {
+      if (selectedFilter.type === "DatePickerField" && (!localValue.startDate || !localValue.endDate)) {
+        setError("Please select both start and end dates.");
+        return;
+      }
+      if (selectedFilter.type === "CheckBoxGroup" && selectedCheckboxes.length === 0) {
+        setError("Please select at least one option.");
+        return;
+      }
+      if (selectedFilter.type === "TextField" && (!localValue || localValue.trim() === "")) {
+        setError("Please enter a value.");
+        return;
+      }
+
+
+      setFilter((prev) => ({
+        ...searchForm,
+        [selectedFilter.header]: {
+          type: searchForm[selectedFilter.header].field,
+          title: searchForm[selectedFilter.header].title,
+          field: searchForm[selectedFilter.header].field,
+          value:
+            selectedFilter.type === "DatePickerField"
+              ? `${localValue.startDate} - ${localValue.endDate}`
+              : selectedFilter.type === "CheckBoxGroup"
+              ? selectedCheckboxes
+              : localValue,
+          operator:
+            selectedFilter.type === "DatePickerField"
+              ? "between"
+              : selectedFilter.type === "CheckBoxGroup"
+              ? "in"
+              : localOperator,
+          source: searchForm[selectedFilter.header].source,
+          displayValue: selectedFilter.type === 'CheckBoxGroup'
+            ? selectedCheckboxes.map((val) => searchForm[selectedFilter.header].source[val]).join(', ')
+            : selectedFilter.type === 'DatePickerField'
+            ? `${localValue.startDate} to ${localValue.endDate}`
+            : localValue,
+        },
+      }));
+    }
+
+    setIsSubMenuOpen(false);
+    setIsMainMenuOpen(false);
+    setLocalOperator('');
+    setLocalValue('');
+    setSelectedCheckboxes([]);
+  };
+  
+
+  const handleCheckboxChange = (value) => {
+    setSelectedCheckboxes((prev) => {
+      if (prev.includes(value)) {
+        return prev.filter((v) => v !== value);
+      } else {
+        return [...prev, value];
+      }
+    });
+  };
+
+  return (
+    <div className="relative">
+      <button
+        onClick={() => {
+          setIsMainMenuOpen(!isMainMenuOpen);
+          setIsSubMenuOpen(false);
+          setSelectedFilter(null);
+          setError('');
+        }}
+        className="btn order-1 primary"
+      >
+        <span className="text-white">+ Add Filters</span>
+      </button>
+      {isMainMenuOpen && (
+        <div className="absolute z-10 mt-4 w-56 bg-white rounded-md shadow-lg ring-0 ring-black ring-opacity-10 top-6">
+          {Object.keys(searchForm).map((key) => (
+            <button
+                key={key}
+                onClick={() => { handleMainMenuClick(key); setError(''); }}
+                className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
+                  selectedFilter?.header === key ? 'bg-indigo-100' : ''
+                }`} // Highlight if selected
+              >
+                {searchForm[key].title || key}
+              </button>
+          ))}
+        </div>
+      )}
+
+      {isSubMenuOpen && (
+        <div className="absolute ml-[227px] mt-4 w-60 bg-white rounded-md shadow-lg p-4 ring-0 ring-black ring-opacity-5 top-6">
+          <div className="font-semibold mb-2">Filter: {searchForm[selectedFilter?.header]?.title}</div>
+
+          <div className="mb-0">
+            {selectedFilter?.type === "DatePickerField" ? (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Start Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={localValue.startDate || ""}
+                  onChange={(e) =>
+                    setLocalValue((prev) => ({
+                      ...prev,
+                      startDate: e.target.value,
+                    }))
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                />
+
+                <label className="block text-sm font-medium text-gray-700 mt-4">
+                  End Date <span className="text-red-500">*</span>
+                </label>
+                <input
+                  type="date"
+                  value={localValue.endDate || ""}
+                  onChange={(e) =>
+                    setLocalValue((prev) => ({
+                      ...prev,
+                      endDate: e.target.value,
+                    }))
+                  }
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                />                
+              </>
+            ) : selectedFilter?.type === "CheckBoxGroup" ? (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Options
+                </label>
+                <div className="mt-1 block border border-gray-300 rounded-md p-2">
+                  {searchForm[selectedFilter?.header]?.source ? (
+                    Object.entries(
+                      searchForm[selectedFilter?.header].source
+                    ).map(([key, option], index) => (
+                      <div key={index} className="flex items-center mb-2">
+                        <input
+                          id={`checkbox-${index}`}
+                          name={`checkbox-${index}`}                          
+                          type="checkbox"
+                          value={key}
+                          onChange={(e) => handleCheckboxChange(e.target.value)}
+                          className="h-4 w-4  border-gray-300 rounded"
+                        />
+                        <label className="ml-2 block text-sm font-medium text-gray-700" htmlFor={`checkbox-${index}`}>
+                          {option}
+                        </label>
+                      </div>
+                    ))
+                  ) : (
+                    <p className="text-sm text-gray-500">
+                      No options available
+                    </p>
+                  )}
+                </div>
+              </>
+            ) : (
+              <>
+                <label className="block text-sm font-medium text-gray-700">
+                  Condition
+                </label>
+                <select
+                  onChange={(e) => setLocalOperator(e.target.value)}
+                  value={localOperator}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                >
+                  {textFieldOperators.map((operator, index) => (
+                    <option key={index} value={operator.title}>
+                      {operator.title}
+                    </option>
+                  ))}
+                </select>
+
+                <label className="block text-sm font-medium text-gray-700 mt-4">
+                  Value
+                </label>
+                <input
+                  type="text"
+                  value={localValue}
+                  onChange={(e) => setLocalValue(e.target.value)}
+                  className="mt-1 block w-full border border-gray-300 rounded-md p-2"
+                  placeholder="Enter value"
+                />
+
+              </>
+              
+            )}
+          </div>
+          {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
+          <div className="flex justify-end space-x-2 mt-4">
+            <button
+              onClick={() => {setIsSubMenuOpen(false); setSelectedFilter(null); setError('');}}
+              className="btn outline"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleClick}
+              className="btn primary"
+            >
+              Apply
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export default GridMenu;
