@@ -1,7 +1,7 @@
 import { useState, useEffect, Children, cloneElement } from "react";
 import GridMenu from "./Filter";
 import Pagination from "./Pagination";
-import DOMPurify from 'dompurify';
+import DOMPurify from "dompurify";
 import { RefreshCw } from "lucide-react";
 
 // Column component for custom rendering
@@ -25,8 +25,8 @@ const Grid = ({
   pageLength = 10,
   refresh,
   setRefreshGrid,
-  onSelectedRows = () => { },
-  children
+  onSelectedRows = () => {},
+  children,
 }) => {
   const [totalCount, setTotalCount] = useState(0);
   const [pageIndex, setPageIndex] = useState(1);
@@ -48,16 +48,14 @@ const Grid = ({
     throw new Error("apiClient is required for Grid component.");
   }
 
-
-
   // Extract custom column renderers from children
   let customActionRenderer = null;
   let customSelectedActionsRenderer = null;
 
-  Children.forEach(children, child => {
-    if (child?.type?.name === 'Action') {
+  Children.forEach(children, (child) => {
+    if (child?.type?.name === "Action") {
       customActionRenderer = child.props.children;
-    } else if (child?.type?.name === 'SelectedActions') {
+    } else if (child?.type?.name === "SelectedActions") {
       customSelectedActionsRenderer = child.props.children;
     }
   });
@@ -80,13 +78,15 @@ const Grid = ({
       // find if checkbox is enabled and isprimarykey field exists
 
       if (response?.enableCheckbox) {
-        if (!response.headers.some(header => header.isPrimaryKey)) {
-          console.error("Grid: 'enableCheckbox' is true but no primary key field is defined in headers. Please define a primary key field with 'isPrimaryKey: true'.");
+        if (!response.headers.some((header) => header.isPrimaryKey)) {
+          console.error(
+            "Grid: 'enableCheckbox' is true but no primary key field is defined in headers. Please define a primary key field with 'isPrimaryKey: true'.",
+          );
         } else {
-          
-          setPrimaryField(response.headers.find(header => header.isPrimaryKey).field);
-          response.records = response.records.map((record) => (
-            {
+          setPrimaryField(
+            response.headers.find((header) => header.isPrimaryKey).field,
+          );
+          response.records = response.records.map((record) => ({
             ...record,
             checked: selectedRecords.includes(record[primaryField]),
           }));
@@ -105,7 +105,7 @@ const Grid = ({
   const htmlMarkup = (dirty) => {
     const sanitizedHtml = DOMPurify.sanitize(dirty);
     return { __html: sanitizedHtml };
-  }
+  };
   const handleSort = (keyname) => {
     setSortKey(keyname);
     setReverse(!reverse);
@@ -127,7 +127,7 @@ const Grid = ({
 
   const renderCheckbox = (record) => {
     const primaryKeyValue = record[primaryField];
-    console.log("record:", record)
+    console.log("record:", record);
     if (!primaryKeyValue) {
       throw new Error("Primary key value not found in record");
     }
@@ -141,7 +141,7 @@ const Grid = ({
         />
       </td>
     ) : null;
-  }
+  };
   const handleSelectAll = (e) => {
     const checked = e.target.checked;
     const keys = list.records.map((record) => record[primaryField]);
@@ -153,10 +153,12 @@ const Grid = ({
         checked,
       })),
     }));
-  }
+  };
   const handleCheckboxChange = (field, primaryKeyValue) => {
     if (selectedRecords.includes(primaryKeyValue)) {
-      setSelectedRecords(selectedRecords.filter((item) => item !== primaryKeyValue));
+      setSelectedRecords(
+        selectedRecords.filter((item) => item !== primaryKeyValue),
+      );
     } else {
       setSelectedRecords([...selectedRecords, primaryKeyValue]);
     }
@@ -172,15 +174,12 @@ const Grid = ({
         return record;
       }),
     }));
-  }
+  };
 
   const exportList = async () => {
     try {
       setIsLoading(true);
-      const response = await apiClient.post(
-        `${apiUrl}?export=csv`,
-        filter,
-      )
+      const response = await apiClient.post(`${apiUrl}?export=csv`, filter);
       setIsLoading(false);
       const link = document.createElement("a");
       link.href = response.file;
@@ -191,15 +190,16 @@ const Grid = ({
       console.error("Error exporting list:", error);
       setIsLoading(false);
     }
-  }
+  };
   // Function to render cell content with custom rendering if available
   const renderCell = (record, colName) => {
     if (list.headers[colName]) {
       // Clone the custom renderer and pass the record value and full record
       const value = record[colName];
-      const customRenderer = typeof list.headers[colName] === 'function'
-        ? list.headers[colName](value, record)
-        : cloneElement(list.headers[colName], { value, record });
+      const customRenderer =
+        typeof list.headers[colName] === "function"
+          ? list.headers[colName](value, record)
+          : cloneElement(list.headers[colName], { value, record });
 
       return customRenderer;
     }
@@ -210,11 +210,11 @@ const Grid = ({
   // Function to get non-Column children that aren't Action or SelectedActions
   const getOtherComponents = () => {
     return Children.toArray(children).filter(
-      child => !child.type || (
-        child.type.name !== 'Column' &&
-        child.type.name !== 'Action' &&
-        child.type.name !== 'SelectedActions'
-      )
+      (child) =>
+        !child.type ||
+        (child.type.name !== "Column" &&
+          child.type.name !== "Action" &&
+          child.type.name !== "SelectedActions"),
     );
   };
   return (
@@ -260,10 +260,7 @@ const Grid = ({
           {selectedRecords.length === 0 ? (
             <div className="flex items-center space-x-2 h-full">
               <GridMenu list={list} setFilter={setFilter} filter={filter} />
-              <button
-                onClick={() => exportList()}
-                className="btn primary"
-              >
+              <button onClick={() => exportList()} className="btn primary">
                 {isloading ? (
                   <svg
                     className="animate-spin h-5 w-5 text-white"
@@ -285,7 +282,9 @@ const Grid = ({
                       d="M4 12a8 8 0 018-8v8H4z"
                     ></path>
                   </svg>
-                ) : 'Export'}
+                ) : (
+                  "Export"
+                )}
               </button>
               <button className="btn primary h-full" onClick={() => getList()}>
                 <RefreshCw size={16} />
@@ -293,12 +292,21 @@ const Grid = ({
             </div>
           ) : customSelectedActionsRenderer ? (
             // Render custom selected actions if provided
-            typeof customSelectedActionsRenderer === 'function'
-              ? customSelectedActionsRenderer(selectedRecords, list.records?.filter(r => selectedRecords.includes(r.primary_key)))
-              : cloneElement(customSelectedActionsRenderer, {
+            typeof customSelectedActionsRenderer === "function" ? (
+              customSelectedActionsRenderer(
+                selectedRecords,
+                list.records?.filter((r) =>
+                  selectedRecords.includes(r.primary_key),
+                ),
+              )
+            ) : (
+              cloneElement(customSelectedActionsRenderer, {
                 selectedIds: selectedRecords,
-                selectedRecords: list.records?.filter(r => selectedRecords.includes(r.primary_key))
+                selectedRecords: list.records?.filter((r) =>
+                  selectedRecords.includes(r.primary_key),
+                ),
               })
+            )
           ) : (
             // Render other non-special children
             getOtherComponents()
@@ -315,13 +323,16 @@ const Grid = ({
                     type="checkbox"
                     className="form-checkbox h-5 w-5 text-primary"
                     onChange={handleSelectAll}
-                    checked={selectedRecords.length === list.records?.length && list.records.length > 0}
+                    checked={
+                      selectedRecords.length === list.records?.length &&
+                      list.records.length > 0
+                    }
                   />
                 </th>
               )}
 
               {/* Use the original header definitions */}
-              {list.headers?.map((header, index) => (
+              {list.headers?.map((header, index) =>
                 // ignore columns that display is false
                 header.display === false ? null : (
                   <th
@@ -336,10 +347,10 @@ const Grid = ({
                       </span>
                     )}
                   </th>
-                )
-              ))}
+                ),
+              )}
 
-              {(customActionRenderer) && (
+              {customActionRenderer && (
                 <th className="px-2 py-2 text-left text-sm font-semibold text-gray-700 shrink uppercase w-10">
                   Actions
                 </th>
@@ -362,28 +373,23 @@ const Grid = ({
                       >
                         {renderCell(record, col.field)}
                       </td>
-                    )
+                    ),
                   )}
-                  {(customActionRenderer) && (
-                    <td
-                      className="flex lg:flex-row flex-col px-2 space-y-2 space-x-2 py-2 text-sm text-gray-600 items-baseline justify-center"
-                    >
-                      {(
+                  {customActionRenderer && (
+                    <td className="flex lg:flex-row flex-col px-2 space-y-2 space-x-2 py-2 text-sm text-gray-600 items-baseline justify-center">
+                      {
                         // Use custom action renderer if provided
-                        typeof customActionRenderer === 'function'
+                        typeof customActionRenderer === "function"
                           ? customActionRenderer(record)
                           : cloneElement(customActionRenderer, { record })
-                      )}
+                      }
                     </td>
                   )}
                 </tr>
               ))
             ) : (
               <tr>
-                <td
-
-                  className="px-6 py-4 text-center text-sm text-gray-600"
-                >
+                <td className="px-6 py-4 text-center text-sm text-gray-600">
                   No records found
                 </td>
               </tr>
@@ -393,13 +399,13 @@ const Grid = ({
       </div>
 
       {/* Pagination */}
-      {(
+      {
         <>
           <div className="flex items-center justify-end mb-4">
             <label htmlFor="pageLength" className="mr-2 text-sm text-gray-600">
               Records per page:
             </label>
-            <div class=" grid grid-cols-1">
+            <div className=" grid grid-cols-1">
               <select
                 id="pageLength"
                 className="form-select border-gray-300 w-36 rounded-md shadow-xs focus:border-primary focus:ring-3 focus:ring-primary focus:ring-opacity-50"
@@ -421,16 +427,15 @@ const Grid = ({
                 fill="currentColor"
                 data-slot="icon"
                 aria-hidden="true"
-                class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
               >
                 <path
                   d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
-                  clip-rule="evenodd"
-                  fill-rule="evenodd"
+                  clipRule="evenodd"
+                  fillRule="evenodd"
                 />
               </svg>
             </div>
-
           </div>
           <Pagination
             pageIndex={pageIndex}
@@ -439,7 +444,7 @@ const Grid = ({
             setPageIndex={setPageIndex}
           />
         </>
-      )}
+      }
     </div>
   );
 };
