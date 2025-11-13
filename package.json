@@ -1,11 +1,11 @@
 {
   "name": "ynotsoft-dynamic-grid",
-  "version": "1.0.23",
+  "version": "1.0.24",
   "description": "DynamicGrid Component",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && cp dist/grid.css grid.css",
     "preview": "vite preview"
   },
   "main": "dist/dynamic-grid.umd.cjs",
@@ -19,7 +19,7 @@
       "import": "./dist/dynamic-grid.js",
       "require": "./dist/dynamic-grid.umd.cjs"
     },
-    "./grid.css": "./dist/index.css"
+    "./grid.css": "./dist/grid.css"
   },
   "files": [
     "dist",
