@@ -1,0 +1,158 @@
+{
+    "headers": [
+        {
+            "title": "Job ID",
+            "sortKey": "JobID",
+            "display": false,
+            "field": "JobID",
+            "isPrimaryKey": true
+        },
+        {
+            "title": "The Job Name",
+            "sortKey": "JobName",
+            "display": true,
+            "field": "JobName",
+            "isPrimaryKey": false
+        },
+        {
+            "title": "Short Description",
+            "sortKey": "ShortDescription",
+            "display": true,
+            "field": "ShortDescription",
+            "isPrimaryKey": false
+        },
+        {
+            "title": "Status",
+            "sortKey": "IsEnabledFlag",
+            "display": true,
+            "field": "IsEnabledFlag",
+            "isPrimaryKey": false
+        },
+        {
+            "title": "Singleton Flag",
+            "sortKey": "IsSingletonFlag",
+            "display": true,
+            "field": "IsSingletonFlag",
+            "isPrimaryKey": false
+        },
+        {
+            "title": "Job Date",
+            "sortKey": "JobDate",
+            "display": true,
+            "field": "JobDate",
+            "isPrimaryKey": false
+        }
+    ],
+    "filters": {
+        "JobName": {
+            "field": "JobName",
+            "type": "Text",
+            "title": "The Job Name",
+            "operator": null,
+            "source": {}
+        },
+        "IsEnabledFlag": {
+            "field": "IsEnabledFlag",
+            "type": "Checkbox",
+            "title": "Status",
+            "operator": null,
+            "source": {
+                "1": "Active",
+                "2": "Inactive",
+                "3": "Suspended",
+                "4": "Deleted"
+            }
+        },
+        "JobDate": {
+            "field": "JobDate",
+            "type": "Date",
+            "title": "Job Date",
+            "operator": null,
+            "source": {}
+        }
+    },
+    "enableCheckbox": true,
+    "records": [
+        {
+            "JobID": 298,
+            "JobName": "GetProcessJob",
+            "ShortDescription": "GetProcessJob",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 297,
+            "JobName": "TasksListJob",
+            "ShortDescription": "TaskListJob",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 296,
+            "JobName": "SendEmailGeneric",
+            "ShortDescription": "Sends a Generic EMail",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 295,
+            "JobName": "GetDiagnosticInfoJob",
+            "ShortDescription": "GetDiagnosticInfo",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 294,
+            "JobName": "RestartServiceNewJob",
+            "ShortDescription": "Restart a Service",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 293,
+            "JobName": "DoSomethingWaitDoTestJob",
+            "ShortDescription": "DoSomethingWaitDoTest Job",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 292,
+            "JobName": "GetDiagnosticInfoJob",
+            "ShortDescription": "GetDiagnosticInfo",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 291,
+            "JobName": "DoSomethingWaitDoTestJob",
+            "ShortDescription": "DoSomethingWaitDoTest Job",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": false,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 290,
+            "JobName": "EvaluateVSCodeJobExecutor",
+            "ShortDescription": "Runs EvaluateVSCodeJob Job",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": true,
+            "JobDate": "0001-01-01T00:00:00"
+        },
+        {
+            "JobID": 289,
+            "JobName": "EvaluateVSCodeJob",
+            "ShortDescription": "Utility: Evaluate VSCode",
+            "IsEnabledFlag": true,
+            "IsSingletonFlag": true,
+            "JobDate": "0001-01-01T00:00:00"
+        }
+    ],
+    "totalCount": 37
+}

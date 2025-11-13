@@ -21,10 +21,10 @@ function GridMenu({ list, setFilter, filter }) {
     setSelectedFilter({ header, type: filter.type });
 
     // Set initial values based on field type
-    if (filter.type === 'TextField') {
+    if (filter.type === 'Text') {
       setLocalOperator(textFieldOperators[0].title); // Set to first option
       setLocalValue(''); // Reset local value
-    } else if (filter.type === 'CheckBoxGroup') {
+    } else if (filter.type === 'Checkbox') {
       setSelectedCheckboxes([]); // Reset checkboxes
     }
     setIsSubMenuOpen(true);
@@ -33,15 +33,15 @@ function GridMenu({ list, setFilter, filter }) {
   const handleClick = () => {
   
     if (selectedFilter && selectedFilter.header) {
-      if (selectedFilter.type === "DatePickerField" && (!localValue.startDate || !localValue.endDate)) {
+      if (selectedFilter.type === "Date" && (!localValue.startDate || !localValue.endDate)) {
         setError("Please select both start and end dates.");
         return;
       }
-      if (selectedFilter.type === "CheckBoxGroup" && selectedCheckboxes.length === 0) {
+      if (selectedFilter.type === "Checkbox" && selectedCheckboxes.length === 0) {
         setError("Please select at least one option.");
         return;
       }
-      if (selectedFilter.type === "TextField" && (!localValue || localValue.trim() === "")) {
+      if (selectedFilter.type === "Text" && (!localValue || localValue.trim() === "")) {
         setError("Please enter a value.");
         return;
       }
@@ -54,21 +54,21 @@ function GridMenu({ list, setFilter, filter }) {
           title: searchForm[selectedFilter.header].title,
           field: searchForm[selectedFilter.header].field,
           value:
-            selectedFilter.type === "DatePickerField"
+            selectedFilter.type === "Date"
               ? `${localValue.startDate} - ${localValue.endDate}`
-              : selectedFilter.type === "CheckBoxGroup"
+              : selectedFilter.type === "Checkbox"
               ? selectedCheckboxes
               : localValue,
           operator:
-            selectedFilter.type === "DatePickerField"
+            selectedFilter.type === "Date"
               ? "between"
-              : selectedFilter.type === "CheckBoxGroup"
+              : selectedFilter.type === "Checkbox"
               ? "in"
               : localOperator,
           source: searchForm[selectedFilter.header].source,
-          displayValue: selectedFilter.type === 'CheckBoxGroup'
+          displayValue: selectedFilter.type === 'Checkbox'
             ? selectedCheckboxes.map((val) => searchForm[selectedFilter.header].source[val]).join(', ')
-            : selectedFilter.type === 'DatePickerField'
+            : selectedFilter.type === 'Date'
             ? `${localValue.startDate} to ${localValue.endDate}`
             : localValue,
         },
@@ -127,7 +127,7 @@ function GridMenu({ list, setFilter, filter }) {
           <div className="font-semibold mb-2">Filter: {searchForm[selectedFilter?.header]?.title}</div>
 
           <div className="mb-0">
-            {selectedFilter?.type === "DatePickerField" ? (
+            {selectedFilter?.type === "Date" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Start Date <span className="text-red-500">*</span>
@@ -159,7 +159,7 @@ function GridMenu({ list, setFilter, filter }) {
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                 />                
               </>
-            ) : selectedFilter?.type === "CheckBoxGroup" ? (
+            ) : selectedFilter?.type === "Checkbox" ? (
               <>
                 <label className="block text-sm font-medium text-gray-700">
                   Options

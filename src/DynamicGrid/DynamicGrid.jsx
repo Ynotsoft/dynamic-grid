@@ -1,24 +1,25 @@
 import { useState, useEffect, Children, cloneElement } from "react";
 import GridMenu from "./Filter";
 import Pagination from "./Pagination";
-import DOMPurify from "dompurify";
 import { RefreshCw } from "lucide-react";
-
 // Column component for custom rendering
 const Column = ({ name, children }) => {
   // This is just a wrapper component that doesn't render anything directly
   return null;
 };
+
 // Action component for custom action rendering
 const Action = ({ children }) => {
   // This is just a wrapper component that doesn't render anything directly
   return null;
 };
+
 // SelectedActions component for custom selected rows actions
 const SelectedActions = ({ children }) => {
   // This is just a wrapper component that doesn't render anything directly
   return null;
 };
+
 const Grid = ({
   apiUrl,
   apiClient,
@@ -38,6 +39,10 @@ const Grid = ({
   const [numberOfRecords, setNumberOfRecords] = useState(pageLength);
   const [isloading, setIsLoading] = useState(false);
   const [primaryField, setPrimaryField] = useState(null);
+  const [customColumns, setCustomColumns] = useState(() => ({}));
+  const [customActionRenderer, setCustomActionRenderer] = useState(() => null);
+  const [customSelectedActionsRenderer, setCustomSelectedActionsRenderer] =
+    useState(() => null);
 
   const pageSizes = [10, 50, 100, 200, 500];
 
@@ -48,23 +53,37 @@ const Grid = ({
     throw new Error("apiClient is required for Grid component.");
   }
 
-  // Extract custom column renderers from children
-  let customActionRenderer = null;
-  let customSelectedActionsRenderer = null;
-
-  Children.forEach(children, (child) => {
-    if (child?.type?.name === "Action") {
-      customActionRenderer = child.props.children;
-    } else if (child?.type?.name === "SelectedActions") {
-      customSelectedActionsRenderer = child.props.children;
-    }
-  });
   useEffect(() => {
     getList();
-  }, [pageIndex, sortKey, reverse, filter, refresh]);
+  }, [pageIndex, sortKey, reverse, filter, refresh, children]);
+
   useEffect(() => {
     onSelectedRows(selectedRecords);
   }, [selectedRecords]);
+
+  useEffect(() => {
+    // Extract custom column renderers from children
+    const columns = {};
+    let actionRenderer = null;
+    let selectedActionsRenderer = null;
+
+    if (children) {
+      Children.forEach(children, (child) => {
+        if (child?.type === Column) {
+          columns[child.props.name] = child.props.children;
+        } else if (child?.type === Action) {
+          actionRenderer = child.props.children;
+        } else if (child?.type === SelectedActions) {
+          selectedActionsRenderer = child.props.children;
+        }
+      });
+    }
+    // Update state only if there are changes
+    setCustomColumns(() => columns);
+    setCustomActionRenderer(() => actionRenderer);
+    setCustomSelectedActionsRenderer(() => selectedActionsRenderer);
+  }, [children]);
+
   const getList = async (num = numberOfRecords) => {
     try {
       const sort_order = reverse ? "DESC" : "ASC";
@@ -102,14 +121,12 @@ const Grid = ({
       console.error("Error fetching list:", error);
     }
   };
-  const htmlMarkup = (dirty) => {
-    const sanitizedHtml = DOMPurify.sanitize(dirty);
-    return { __html: sanitizedHtml };
-  };
+
   const handleSort = (keyname) => {
     setSortKey(keyname);
     setReverse(!reverse);
   };
+
   const handleRemoveFilter = (key) => {
     setFilter((prevFilter) => ({
       ...prevFilter,
@@ -126,8 +143,8 @@ const Grid = ({
   }, [filter, sortKey, reverse]);
 
   const renderCheckbox = (record) => {
+    if (list.enableCheckbox !== true) return null;
     const primaryKeyValue = record[primaryField];
-    console.log("record:", record);
     if (!primaryKeyValue) {
       throw new Error("Primary key value not found in record");
     }
@@ -193,9 +210,9 @@ const Grid = ({
   };
   // Function to render cell content with custom rendering if available
   const renderCell = (record, colName) => {
+    const value = record[colName];
+
     if (list.headers[colName]) {
-      // Clone the custom renderer and pass the record value and full record
-      const value = record[colName];
       const customRenderer =
         typeof list.headers[colName] === "function"
           ? list.headers[colName](value, record)
@@ -204,23 +221,27 @@ const Grid = ({
       return customRenderer;
     }
 
-    // Default rendering if no custom renderer is provided
-    return <div dangerouslySetInnerHTML={htmlMarkup(record[colName])} />;
+    // Default HTML-safe rendering
+    return <div dangerouslySetInnerHTML={{ __html: value ?? "" }} />;
   };
+
   // Function to get non-Column children that aren't Action or SelectedActions
   const getOtherComponents = () => {
+    if (!children) return [];
+
     return Children.toArray(children).filter(
       (child) =>
-        !child.type ||
-        (child.type.name !== "Column" &&
-          child.type.name !== "Action" &&
-          child.type.name !== "SelectedActions"),
+        !child?.type ||
+        (child.type !== Column &&
+          child.type !== Action &&
+          child.type !== SelectedActions),
     );
   };
+
   return (
     <div className="w-full max-w-full mx-auto  ">
       <div className="flex justify-between mt-4 h-auto ">
-        <div className="flex gap-x-2 items-center mb-4">
+        <div className="flex gap-x-2 items-center mb-4 w-full">
           {Object.keys(filter).map((key) => {
             const cond = filter[key];
             if (cond.value && cond.operator) {
@@ -258,37 +279,45 @@ const Grid = ({
             return null;
           })}
           {selectedRecords.length === 0 ? (
-            <div className="flex items-center space-x-2 h-full">
-              <GridMenu list={list} setFilter={setFilter} filter={filter} />
-              <button onClick={() => exportList()} className="btn primary">
-                {isloading ? (
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
+            <div className="w-full flex justify-between items-center">
+              <div className="flex gap-2">
+                <GridMenu list={list} setFilter={setFilter} filter={filter} />
+                <div className="flex gap-2">
+                  <button onClick={() => exportList()} className="btn primary">
+                    {isloading ? (
+                      <svg
+                        className="animate-spin h-5 w-5 text-white"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v8H4z"
+                        ></path>
+                      </svg>
+                    ) : (
+                      "Export"
+                    )}
+                  </button>
+                  <button
+                    className="btn primary h-full"
+                    onClick={() => getList()}
                   >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    ></circle>
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v8H4z"
-                    ></path>
-                  </svg>
-                ) : (
-                  "Export"
-                )}
-              </button>
-              <button className="btn primary h-full" onClick={() => getList()}>
-                <RefreshCw size={16} />
-              </button>
+                    <RefreshCw size={16} />
+                  </button>
+                </div>
+              </div>
+              <div className="flex gap-2">{getOtherComponents()}</div>
             </div>
           ) : customSelectedActionsRenderer ? (
             // Render custom selected actions if provided
@@ -313,6 +342,7 @@ const Grid = ({
           )}
         </div>
       </div>
+
       <div className=" mb-4">
         <table className="max-w-full w-full mx-auto bg-white divide-y divide-gray-200">
           <thead className="bg-slate-200">
@@ -351,9 +381,7 @@ const Grid = ({
               )}
 
               {customActionRenderer && (
-                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-700 shrink uppercase w-10">
-                  Actions
-                </th>
+                <th className="px-2 py-2 text-left text-sm font-semibold text-gray-700 shrink uppercase w-10"></th>
               )}
             </tr>
           </thead>
@@ -362,9 +390,6 @@ const Grid = ({
               list.records.map((record, index) => (
                 <tr key={index} className="hover:bg-gray-100">
                   {renderCheckbox(record)}
-
-                  {/* Render cells for each column, with custom rendering if available */}
-                  {/* Render all normal columns first */}
                   {list.headers.map((col, colIndex) =>
                     col.display === false ? null : (
                       <td
@@ -375,14 +400,13 @@ const Grid = ({
                       </td>
                     ),
                   )}
+
+                  {/* Render custom action column if defined or if showActions is true */}
                   {customActionRenderer && (
                     <td className="flex lg:flex-row flex-col px-2 space-y-2 space-x-2 py-2 text-sm text-gray-600 items-baseline justify-center">
-                      {
-                        // Use custom action renderer if provided
-                        typeof customActionRenderer === "function"
-                          ? customActionRenderer(record)
-                          : cloneElement(customActionRenderer, { record })
-                      }
+                      {typeof customActionRenderer === "function"
+                        ? customActionRenderer(record)
+                        : cloneElement(customActionRenderer, { record })}
                     </td>
                   )}
                 </tr>
@@ -408,7 +432,7 @@ const Grid = ({
             <div className=" grid grid-cols-1">
               <select
                 id="pageLength"
-                className="form-select border-gray-300 w-36 rounded-md shadow-xs focus:border-primary focus:ring-3 focus:ring-primary focus:ring-opacity-50"
+                className="form-select border-gray-300 rounded-md shadow-xs focus:border-primary focus:ring-3 focus:ring-primary focus:ring-opacity-50"
                 value={numberOfRecords}
                 onChange={(e) => {
                   setPageIndex(1);
