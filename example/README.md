@@ -30,11 +30,3 @@ npm link ynotsoft-dynamic-grid
 ```
 npm run dev
 ```
-
-## Overview
-
-The DynamicGrid component provides a flexible, declarative way to build grids
-
-## Basic Usage:
-
-TODO
