@@ -172,13 +172,13 @@ Dynamic Grid calls your API with POST requests and expects a JSON payload shaped
 
 ```json
 {
-		"headers": [
-			{ "title": "Product ID", "sortKey": "ProductID", "display": false, "field": "ProductID", "isPrimaryKey": true },
-			{ "title": "Product Name", "sortKey": "ProductName", "display": true, "field": "ProductName", "isPrimaryKey": false },
-			{ "title": "Category", "sortKey": "Category", "display": true, "field": "Category", "isPrimaryKey": false },
-			{ "title": "In Stock", "sortKey": "InStock", "display": true, "field": "InStock", "isPrimaryKey": false },
-			{ "title": "Available Date", "sortKey": "AvailableDate", "display": true, "field": "AvailableDate", "isPrimaryKey": false }
-		],
+	"headers": [
+		{ "title": "Product ID", "sortKey": "ProductID", "display": false, "field": "ProductID", "isPrimaryKey": true },
+		{ "title": "Product Name", "sortKey": "ProductName", "display": true, "field": "ProductName", "isPrimaryKey": false },
+		{ "title": "Category", "sortKey": "Category", "display": true, "field": "Category", "isPrimaryKey": false },
+		{ "title": "In Stock", "sortKey": "InStock", "display": true, "field": "InStock", "isPrimaryKey": false },
+		{ "title": "Available Date", "sortKey": "AvailableDate", "display": true, "field": "AvailableDate", "isPrimaryKey": false }
+	],
 	"filters": {
 		"ProductName": { "field": "ProductName", "type": "Text", "title": "Product Name", "source": {} },
 		"Category": { "field": "Category", "type": "Text", "title": "Category", "source": {} },
