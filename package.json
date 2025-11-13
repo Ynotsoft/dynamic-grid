@@ -8,7 +8,7 @@
     "build": "vite build",
     "preview": "vite preview"
   },
-  "main": "dist/dynamic-grid-umd.cjs",
+  "main": "dist/dynamic-grid.umd.cjs",
   "module": "dist/dynamic-grid.js",
   "repository": {
     "type": "git",
@@ -17,7 +17,7 @@
   "exports": {
     ".": {
       "import": "./dist/dynamic-grid.js",
-      "require": "./dist/dynamic-grid-umd.cjs"
+      "require": "./dist/dynamic-grid.umd.cjs"
     },
     "./index.css": "./dist/index.css"
   },
