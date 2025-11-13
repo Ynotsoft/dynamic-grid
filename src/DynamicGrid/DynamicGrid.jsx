@@ -152,7 +152,7 @@ const Grid = ({
       <td className="px-2 py-1 text-sm text-gray-600">
         <input
           type="checkbox"
-          className="form-checkbox h-5 w-5 text-primary"
+          className="form-checkbox h-5 w-5 accent-primary"
           checked={record.checked || false}
           onChange={() => handleCheckboxChange(primaryField, primaryKeyValue)}
         />
@@ -351,7 +351,7 @@ const Grid = ({
                 <th className="px-2 py-2 text-left text-sm font-semibold text-gray-700 shrink uppercase w-10">
                   <input
                     type="checkbox"
-                    className="form-checkbox h-5 w-5 text-primary"
+                    className="form-checkbox h-5 w-5 accent-primary"
                     onChange={handleSelectAll}
                     checked={
                       selectedRecords.length === list.records?.length &&
