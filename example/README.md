@@ -1,16 +1,40 @@
-# React + Vite
+## Install
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+npm install ynotsoft-dynamic-grid
 
-Currently, two official plugins are available:
+~~install peer dependencies~~
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+~~npm install react-hot-toast dayjs react-select react-day-picker dompurify @radix-ui/react-label @radix-ui/react-popover @radix-ui/react-radio-group @radix-ui/react-select @radix-ui/react-separator @heroicons/react~~
 
-## React Compiler
+### Build the Library
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+From the root of the library (dynamic-grid/):
 
-## Expanding the ESLint configuration
+```
+npm i
+npm run build
+npm link
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+### Link It Inside the Example App
+
+Now connect the example app to the linked library:
+
+```
+cd ../example
+npm link ynotsoft-dynamic-grid
+```
+
+### Start the Example App
+
+```
+npm run dev
+```
+
+## Overview
+
+The DynamicGrid component provides a flexible, declarative way to build grids
+
+## Basic Usage:
+
+TODO

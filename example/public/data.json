@@ -1,72 +1,70 @@
 {
     "headers": [
         {
-            "title": "Job ID",
-            "sortKey": "JobID",
+            "title": "Product ID",
+            "sortKey": "ProductID",
             "display": false,
-            "field": "JobID",
+            "field": "ProductID",
             "isPrimaryKey": true
         },
         {
-            "title": "The Job Name",
-            "sortKey": "JobName",
+            "title": "Product Name",
+            "sortKey": "ProductName",
             "display": true,
-            "field": "JobName",
+            "field": "ProductName",
             "isPrimaryKey": false
         },
         {
-            "title": "Short Description",
-            "sortKey": "ShortDescription",
+            "title": "Category",
+            "sortKey": "Category",
             "display": true,
-            "field": "ShortDescription",
+            "field": "Category",
             "isPrimaryKey": false
         },
         {
-            "title": "Status",
-            "sortKey": "IsEnabledFlag",
+            "title": "In Stock",
+            "sortKey": "InStock",
             "display": true,
-            "field": "IsEnabledFlag",
+            "field": "InStock",
             "isPrimaryKey": false
         },
         {
-            "title": "Singleton Flag",
-            "sortKey": "IsSingletonFlag",
+            "title": "Available Date",
+            "sortKey": "AvailableDate",
             "display": true,
-            "field": "IsSingletonFlag",
-            "isPrimaryKey": false
-        },
-        {
-            "title": "Job Date",
-            "sortKey": "JobDate",
-            "display": true,
-            "field": "JobDate",
+            "field": "AvailableDate",
             "isPrimaryKey": false
         }
     ],
     "filters": {
-        "JobName": {
-            "field": "JobName",
+        "ProductName": {
+            "field": "ProductName",
             "type": "Text",
-            "title": "The Job Name",
+            "title": "Product Name",
             "operator": null,
             "source": {}
         },
-        "IsEnabledFlag": {
-            "field": "IsEnabledFlag",
+        "Category": {
+            "field": "Category",
+            "type": "Text",
+            "title": "Category",
+            "operator": null,
+            "source": {}
+        },
+        "InStock": {
+            "field": "InStock",
             "type": "Checkbox",
-            "title": "Status",
+            "title": "In Stock",
             "operator": null,
             "source": {
-                "1": "Active",
-                "2": "Inactive",
-                "3": "Suspended",
-                "4": "Deleted"
+                "1": "Yes",
+                "2": "No"
             }
         },
-        "JobDate": {
-            "field": "JobDate",
+        "AvailableDate": {
+            "field": "AvailableDate",
             "type": "Date",
-            "title": "Job Date",
+            "title": "Available Date",
             "operator": null,
             "source": {}
         }
@@ -74,85 +72,19 @@
     "enableCheckbox": true,
     "records": [
         {
-            "JobID": 298,
-            "JobName": "GetProcessJob",
-            "ShortDescription": "GetProcessJob",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
+            "ProductID": 1,
+            "ProductName": "Wireless Mouse",
+            "Category": "Accessories",
+            "InStock": true,
+            "AvailableDate": "2024-03-01"
         },
         {
-            "JobID": 297,
-            "JobName": "TasksListJob",
-            "ShortDescription": "TaskListJob",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 296,
-            "JobName": "SendEmailGeneric",
-            "ShortDescription": "Sends a Generic EMail",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 295,
-            "JobName": "GetDiagnosticInfoJob",
-            "ShortDescription": "GetDiagnosticInfo",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 294,
-            "JobName": "RestartServiceNewJob",
-            "ShortDescription": "Restart a Service",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 293,
-            "JobName": "DoSomethingWaitDoTestJob",
-            "ShortDescription": "DoSomethingWaitDoTest Job",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 292,
-            "JobName": "GetDiagnosticInfoJob",
-            "ShortDescription": "GetDiagnosticInfo",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 291,
-            "JobName": "DoSomethingWaitDoTestJob",
-            "ShortDescription": "DoSomethingWaitDoTest Job",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": false,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 290,
-            "JobName": "EvaluateVSCodeJobExecutor",
-            "ShortDescription": "Runs EvaluateVSCodeJob Job",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": true,
-            "JobDate": "0001-01-01T00:00:00"
-        },
-        {
-            "JobID": 289,
-            "JobName": "EvaluateVSCodeJob",
-            "ShortDescription": "Utility: Evaluate VSCode",
-            "IsEnabledFlag": true,
-            "IsSingletonFlag": true,
-            "JobDate": "0001-01-01T00:00:00"
+            "ProductID": 2,
+            "ProductName": "USB-C Hub",
+            "Category": "Accessories",
+            "InStock": false,
+            "AvailableDate": "2024-03-10"
         }
     ],
-    "totalCount": 37
+    "totalCount": 2
 }
