@@ -3,6 +3,11 @@ name: Publish ynotsoft-dynamic-grid
 on:
   release:
     types: [published]
+
+  push:
+    tags:
+      - "v*"
+
   workflow_dispatch:
     inputs:
       version:
