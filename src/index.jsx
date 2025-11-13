@@ -1,10 +1,4 @@
-import css from "./index.css?inline";
-
-if (typeof document !== "undefined") {
-  const style = document.createElement("style");
-  style.innerHTML = css;
-  document.head.appendChild(style);
-}
+import "./index.css";
 
 export { default as DynamicGrid } from "./DynamicGrid/DynamicGrid.jsx";
 import DynamicGridComponent from "./DynamicGrid/DynamicGrid.jsx";

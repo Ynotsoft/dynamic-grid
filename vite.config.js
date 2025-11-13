@@ -14,7 +14,7 @@ export default defineConfig({
       formats: ["es", "umd"],
       fileName: (format) =>
         format === "umd" ? "dynamic-grid.umd.cjs" : "dynamic-grid.js",
-      cssFileName: "index",
+      cssFileName: "grid",
     },
     rollupOptions: {
       external: [

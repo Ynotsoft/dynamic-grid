@@ -1,13 +1,13 @@
 @import "tailwindcss";
 
-/* -----------------------------------------------
-   Scan internal library files
------------------------------------------------- */
+/* ------------------------------------------------------------------
+   1) Tell Tailwind which files to scan inside the library
+------------------------------------------------------------------ */
 @source "./**/*.jsx";
 
-/* -----------------------------------------------
-   Inline expansions (safe for libraries)
------------------------------------------------- */
+/* ------------------------------------------------------------------
+   2) Inline utility expansions (your existing custom utilities)
+------------------------------------------------------------------ */
 @source inline("col-span-{{1...12}}");
 @source inline("grid-cols-{{1...12}}");
 @source inline("gap-{{0...10}}");
@@ -30,9 +30,11 @@
 @source inline("w-{{full,1/2,1/3,2/3,1/4,3/4}}");
 @source inline("h-{{full,screen}}");
 
-/* -----------------------------------------------
-   Force-include class families needed by library
------------------------------------------------- */
+/* ------------------------------------------------------------------
+   3) Class families that always need to exist
+      These reference theme tokens (so users can override them)
+------------------------------------------------------------------ */
+
 @source inline("bg-primary");
 @source inline("bg-primary-hover");
 @source inline("text-primary");
@@ -77,28 +79,34 @@
 @source inline("hover:text-destructive");
 @source inline("hover:ring-destructive");
 
-/* ============================================================
-   1) Declare THEME TOKENS (User will override these)
-   Uses INITAL values so users can override normally.
-   ***This MUST be @theme (not :root)***
-============================================================ */
+/* ------------------------------------------------------------------
+   4) DECLARE THE TOKENS — REQUIRED FOR TAILWIND v4
+      These tokens create utilities like bg-primary, text-primary, etc.
+      Users can override them via their own @theme block.
+------------------------------------------------------------------ */
+
 @theme {
+  /* Primary */
   --color-primary: initial;
   --color-primary-hover: initial;
   --color-primary-foreground: initial;
 
+  /* Secondary */
   --color-secondary: initial;
   --color-secondary-hover: initial;
   --color-secondary-foreground: initial;
 
+  /* Destructive */
   --color-destructive: initial;
   --color-destructive-hover: initial;
   --color-destructive-foreground: initial;
 
+  /* Accent */
   --color-accent: initial;
   --color-accent-hover: initial;
   --color-accent-foreground: initial;
 
+  /* Muted */
   --color-muted: initial;
   --color-muted-hover: initial;
   --color-muted-foreground: initial;
@@ -106,13 +114,13 @@
   --color-border: initial;
 }
 
-/* ============================================================
-   2) DEFAULTS for your library
-   Users override these in THEIR project using @theme{}.
-   ***THIS MUST BE @theme defaults — NOT :root***
-============================================================ */
-@theme defaults {
+/* ------------------------------------------------------------------
+   5) DEFAULT VALUES (Library defaults)
+      These are ONLY the fallback values.
+      Users override these in THEIR OWN project `@theme` block.
+------------------------------------------------------------------ */
 
+:root {
   /* PRIMARY */
   --color-primary: #000;
   --color-primary-hover: #6c6c6c;
@@ -120,8 +128,8 @@
 
   /* SECONDARY */
   --color-secondary: oklch(0.85 0.05 250);
-  --color-secondary-hover: oklch(0.80 0.06 250);
-  --color-secondary-foreground: oklch(0.25 0.10 250);
+  --color-secondary-hover: oklch(0.8 0.06 250);
+  --color-secondary-foreground: oklch(0.25 0.1 250);
 
   /* DESTRUCTIVE */
   --color-destructive: oklch(0.65 0.25 25);
@@ -131,7 +139,7 @@
   /* ACCENT */
   --color-accent: oklch(0.92 0.05 160);
   --color-accent-hover: oklch(0.88 0.06 160);
-  --color-accent-foreground: oklch(0.20 0.10 160);
+  --color-accent-foreground: oklch(0.2 0.1 160);
 
   /* MUTED */
   --color-muted: oklch(0.95 0 0);
