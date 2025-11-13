@@ -60,8 +60,8 @@ jobs:
         run: |
           echo "Verifying dist outputs..."
           # Adjust these to match your Vite lib output if different
-          test -f dist/index.js
-          test -f dist/index.cjs
+          test -f dist/dynamic-grid.js
+          test -f dist/dynamic-grid.umd.cjs
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
