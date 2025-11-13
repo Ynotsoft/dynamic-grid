@@ -23,6 +23,7 @@
   },
   "files": [
     "dist",
+    "grid.css",
     "README.md"
   ],
   "sideEffects": [
