@@ -5,58 +5,8 @@
 ------------------------------------------------------------------ */
 @source "./**/*.jsx";
 
-
 /* ------------------------------------------------------------------
-   3) Class families that always need to exist
-      These reference theme tokens (so users can override them)
------------------------------------------------------------------- */
-
-@source inline("bg-primary");
-@source inline("bg-primary-hover");
-@source inline("text-primary");
-@source inline("text-primary-foreground");
-@source inline("border-primary");
-@source inline("ring-primary");
-@source inline("hover:bg-primary");
-@source inline("hover:border-primary");
-@source inline("hover:text-primary");
-@source inline("hover:ring-primary");
-
-@source inline("bg-secondary");
-@source inline("bg-secondary-hover");
-@source inline("text-secondary");
-@source inline("text-secondary-foreground");
-@source inline("border-secondary");
-@source inline("ring-secondary");
-@source inline("hover:bg-secondary");
-@source inline("hover:border-secondary");
-@source inline("hover:text-secondary");
-@source inline("hover:ring-secondary");
-
-@source inline("bg-accent");
-@source inline("bg-accent-hover");
-@source inline("text-accent");
-@source inline("text-accent-foreground");
-@source inline("border-accent");
-@source inline("ring-accent");
-@source inline("hover:bg-accent");
-@source inline("hover:border-accent");
-@source inline("hover:text-accent");
-@source inline("hover:ring-accent");
-
-@source inline("bg-destructive");
-@source inline("bg-destructive-hover");
-@source inline("text-destructive");
-@source inline("text-destructive-foreground");
-@source inline("border-destructive");
-@source inline("ring-destructive");
-@source inline("hover:bg-destructive");
-@source inline("hover:border-destructive");
-@source inline("hover:text-destructive");
-@source inline("hover:ring-destructive");
-
-/* ------------------------------------------------------------------
-   4) DECLARE THE TOKENS — REQUIRED FOR TAILWIND v4
+   2) DECLARE THE TOKENS — REQUIRED FOR TAILWIND v4
       These tokens create utilities like bg-primary, text-primary, etc.
       Users can override them via their own @theme block.
 ------------------------------------------------------------------ */
