@@ -1,19 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 function GridMenu({ list, setFilter, filter }) {
   const [isMainMenuOpen, setIsMainMenuOpen] = useState(false);
   const [isSubMenuOpen, setIsSubMenuOpen] = useState(false);
   const [selectedFilter, setSelectedFilter] = useState(null);
   const [selectedCheckboxes, setSelectedCheckboxes] = useState([]);
-  const [localOperator, setLocalOperator] = useState('');
-  const [localValue, setLocalValue] = useState('');
-  const [error, setError] = useState('');
+  const [localOperator, setLocalOperator] = useState("");
+  const [localValue, setLocalValue] = useState("");
+  const [error, setError] = useState("");
 
   const searchForm = list?.filters || {};
   const textFieldOperators = [
-    { title: 'contains' },
-    { title: 'equals' },
-    { title: 'starts with' }
+    { title: "contains" },
+    { title: "equals" },
+    { title: "starts with" },
   ];
 
   const handleMainMenuClick = (header) => {
@@ -21,31 +21,38 @@ function GridMenu({ list, setFilter, filter }) {
     setSelectedFilter({ header, type: filter.type });
 
     // Set initial values based on field type
-    if (filter.type === 'Text') {
+    if (filter.type === "Text") {
       setLocalOperator(textFieldOperators[0].title); // Set to first option
-      setLocalValue(''); // Reset local value
-    } else if (filter.type === 'Checkbox') {
+      setLocalValue(""); // Reset local value
+    } else if (filter.type === "Checkbox") {
       setSelectedCheckboxes([]); // Reset checkboxes
     }
     setIsSubMenuOpen(true);
   };
 
   const handleClick = () => {
-  
     if (selectedFilter && selectedFilter.header) {
-      if (selectedFilter.type === "Date" && (!localValue.startDate || !localValue.endDate)) {
+      if (
+        selectedFilter.type === "Date" &&
+        (!localValue.startDate || !localValue.endDate)
+      ) {
         setError("Please select both start and end dates.");
         return;
       }
-      if (selectedFilter.type === "Checkbox" && selectedCheckboxes.length === 0) {
+      if (
+        selectedFilter.type === "Checkbox" &&
+        selectedCheckboxes.length === 0
+      ) {
         setError("Please select at least one option.");
         return;
       }
-      if (selectedFilter.type === "Text" && (!localValue || localValue.trim() === "")) {
+      if (
+        selectedFilter.type === "Text" &&
+        (!localValue || localValue.trim() === "")
+      ) {
         setError("Please enter a value.");
         return;
       }
-
 
       setFilter((prev) => ({
         ...searchForm,
@@ -57,31 +64,33 @@ function GridMenu({ list, setFilter, filter }) {
             selectedFilter.type === "Date"
               ? `${localValue.startDate} - ${localValue.endDate}`
               : selectedFilter.type === "Checkbox"
-              ? selectedCheckboxes
-              : localValue,
+                ? selectedCheckboxes
+                : localValue,
           operator:
             selectedFilter.type === "Date"
               ? "between"
               : selectedFilter.type === "Checkbox"
-              ? "in"
-              : localOperator,
+                ? "in"
+                : localOperator,
           source: searchForm[selectedFilter.header].source,
-          displayValue: selectedFilter.type === 'Checkbox'
-            ? selectedCheckboxes.map((val) => searchForm[selectedFilter.header].source[val]).join(', ')
-            : selectedFilter.type === 'Date'
-            ? `${localValue.startDate} to ${localValue.endDate}`
-            : localValue,
+          displayValue:
+            selectedFilter.type === "Checkbox"
+              ? selectedCheckboxes
+                  .map((val) => searchForm[selectedFilter.header].source[val])
+                  .join(", ")
+              : selectedFilter.type === "Date"
+                ? `${localValue.startDate} to ${localValue.endDate}`
+                : localValue,
         },
       }));
     }
 
     setIsSubMenuOpen(false);
     setIsMainMenuOpen(false);
-    setLocalOperator('');
-    setLocalValue('');
+    setLocalOperator("");
+    setLocalValue("");
     setSelectedCheckboxes([]);
   };
-  
 
   const handleCheckboxChange = (value) => {
     setSelectedCheckboxes((prev) => {
@@ -100,7 +109,7 @@ function GridMenu({ list, setFilter, filter }) {
           setIsMainMenuOpen(!isMainMenuOpen);
           setIsSubMenuOpen(false);
           setSelectedFilter(null);
-          setError('');
+          setError("");
         }}
         className="btn order-1 primary"
       >
@@ -110,21 +119,26 @@ function GridMenu({ list, setFilter, filter }) {
         <div className="absolute z-10 mt-4 w-56 bg-white rounded-md shadow-lg ring-0 ring-black ring-opacity-10 top-6">
           {Object.keys(searchForm).map((key) => (
             <button
-                key={key}
-                onClick={() => { handleMainMenuClick(key); setError(''); }}
-                className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
-                  selectedFilter?.header === key ? 'bg-indigo-100' : ''
-                }`} // Highlight if selected
-              >
-                {searchForm[key].title || key}
-              </button>
+              key={key}
+              onClick={() => {
+                handleMainMenuClick(key);
+                setError("");
+              }}
+              className={`block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 w-full text-left ${
+                selectedFilter?.header === key ? "bg-indigo-100" : ""
+              }`} // Highlight if selected
+            >
+              {searchForm[key].title || key}
+            </button>
           ))}
         </div>
       )}
 
       {isSubMenuOpen && (
         <div className="absolute ml-[227px] mt-4 w-60 bg-white rounded-md shadow-lg p-4 ring-0 ring-black ring-opacity-5 top-6">
-          <div className="font-semibold mb-2">Filter: {searchForm[selectedFilter?.header]?.title}</div>
+          <div className="font-semibold mb-2">
+            Filter: {searchForm[selectedFilter?.header]?.title}
+          </div>
 
           <div className="mb-0">
             {selectedFilter?.type === "Date" ? (
@@ -157,7 +171,7 @@ function GridMenu({ list, setFilter, filter }) {
                     }))
                   }
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
-                />                
+                />
               </>
             ) : selectedFilter?.type === "Checkbox" ? (
               <>
@@ -167,18 +181,21 @@ function GridMenu({ list, setFilter, filter }) {
                 <div className="mt-1 block border border-gray-300 rounded-md p-2">
                   {searchForm[selectedFilter?.header]?.source ? (
                     Object.entries(
-                      searchForm[selectedFilter?.header].source
+                      searchForm[selectedFilter?.header].source,
                     ).map(([key, option], index) => (
                       <div key={index} className="flex items-center mb-2">
                         <input
                           id={`checkbox-${index}`}
-                          name={`checkbox-${index}`}                          
+                          name={`checkbox-${index}`}
                           type="checkbox"
                           value={key}
                           onChange={(e) => handleCheckboxChange(e.target.value)}
                           className="h-4 w-4  border-gray-300 rounded"
                         />
-                        <label className="ml-2 block text-sm font-medium text-gray-700" htmlFor={`checkbox-${index}`}>
+                        <label
+                          className="ml-2 block text-sm font-medium text-gray-700"
+                          htmlFor={`checkbox-${index}`}
+                        >
                           {option}
                         </label>
                       </div>
@@ -217,23 +234,22 @@ function GridMenu({ list, setFilter, filter }) {
                   className="mt-1 block w-full border border-gray-300 rounded-md p-2"
                   placeholder="Enter value"
                 />
-
               </>
-              
             )}
           </div>
           {error && <div className="text-red-500 text-sm mb-4">{error}</div>}
           <div className="flex justify-end space-x-2 mt-4">
             <button
-              onClick={() => {setIsSubMenuOpen(false); setSelectedFilter(null); setError('');}}
+              onClick={() => {
+                setIsSubMenuOpen(false);
+                setSelectedFilter(null);
+                setError("");
+              }}
               className="btn outline"
             >
               Cancel
             </button>
-            <button
-              onClick={handleClick}
-              className="btn primary"
-            >
+            <button onClick={handleClick} className="btn primary">
               Apply
             </button>
           </div>

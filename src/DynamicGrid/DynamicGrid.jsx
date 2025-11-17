@@ -152,7 +152,7 @@ const Grid = ({
       <td className="px-2 py-1 text-sm text-gray-600">
         <input
           type="checkbox"
-          className="form-checkbox h-5 w-5 accent-primary"
+          className="form-checkbox h-5 w-5 text-primary"
           checked={record.checked || false}
           onChange={() => handleCheckboxChange(primaryField, primaryKeyValue)}
         />
@@ -212,16 +212,17 @@ const Grid = ({
   const renderCell = (record, colName) => {
     const value = record[colName];
 
-    if (list.headers[colName]) {
+    // Check for custom column renderer
+    if (customColumns[colName]) {
       const customRenderer =
-        typeof list.headers[colName] === "function"
-          ? list.headers[colName](value, record)
-          : cloneElement(list.headers[colName], { value, record });
+        typeof customColumns[colName] === "function"
+          ? customColumns[colName](value, record)
+          : cloneElement(customColumns[colName], { value, record });
 
       return customRenderer;
     }
 
-    // Default HTML-safe rendering
+    // Default HTML rendering
     return <div dangerouslySetInnerHTML={{ __html: value ?? "" }} />;
   };
 
@@ -351,7 +352,7 @@ const Grid = ({
                 <th className="px-2 py-2 text-left text-sm font-semibold text-gray-700 shrink uppercase w-10">
                   <input
                     type="checkbox"
-                    className="form-checkbox h-5 w-5 accent-primary"
+                    className="form-checkbox h-5 w-5 text-primary"
                     onChange={handleSelectAll}
                     checked={
                       selectedRecords.length === list.records?.length &&
@@ -429,7 +430,7 @@ const Grid = ({
             <label htmlFor="pageLength" className="mr-2 text-sm text-gray-600">
               Records per page:
             </label>
-            <div className=" grid grid-cols-1">
+            <div class=" grid grid-cols-1">
               <select
                 id="pageLength"
                 className="form-select border-gray-300 rounded-md shadow-xs focus:border-primary focus:ring-3 focus:ring-primary focus:ring-opacity-50"
@@ -451,12 +452,12 @@ const Grid = ({
                 fill="currentColor"
                 data-slot="icon"
                 aria-hidden="true"
-                className="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
+                class="pointer-events-none col-start-1 row-start-1 mr-2 size-5 self-center justify-self-end text-gray-500 sm:size-4"
               >
                 <path
                   d="M4.22 6.22a.75.75 0 0 1 1.06 0L8 8.94l2.72-2.72a.75.75 0 1 1 1.06 1.06l-3.25 3.25a.75.75 0 0 1-1.06 0L4.22 7.28a.75.75 0 0 1 0-1.06Z"
-                  clipRule="evenodd"
-                  fillRule="evenodd"
+                  clip-rule="evenodd"
+                  fill-rule="evenodd"
                 />
               </svg>
             </div>
