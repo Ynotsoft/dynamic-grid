@@ -245,21 +245,24 @@ export default function ActionColumnExample() {
   );
 }
 ```
+#### Example: in-line filter fields (Grid.Filter)
 
-#### Example: custom cell renderer (Grid.Column)
+#### Example: custom cell renderer (Grid.Field)
 
 ```jsx
-import { DynamicGrid as Grid } from "ynotsoft-dynamic-grid";
+import FilterBuilder from '@/DynamicGrid/FilterBuilder';
 
-export default function CustomColumnExample() {
+const Filters = FilterBuilder;
+
+export default function CustomFieldExample() {
   return (
     <Grid apiUrl="/products" apiClient={apiClient} pageLength={10}>
       {/* Render ProductName in bold and show Category in the tooltip */}
-      <Grid.Column name="ProductName">
-        {(value, record) => (
-          <strong title={`Category: ${record.Category}`}>{value}</strong>
-        )}
-      </Grid.Column>
+          <Grid.Filters fieldClass="p-4 rounded-md mb-4" type="inline" >
+            <Filters.Field name="Name" fieldClass="col-span-12" />
+            <Filters.Field name="IsEnabledFlag" fieldClass="col-span-6" />
+            <Filters.Field name="Date" fieldClass="col-span-12" includeTime={true} />
+          </Grid.Filters>
     </Grid>
   );
 }
