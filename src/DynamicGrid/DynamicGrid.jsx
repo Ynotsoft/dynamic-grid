@@ -404,7 +404,7 @@ const Grid = ({
 
                   {/* Render custom action column if defined or if showActions is true */}
                   {customActionRenderer && (
-                    <td className="flex lg:flex-row flex-col px-2 space-y-2 space-x-2 py-2 text-sm text-gray-600 items-baseline justify-center">
+                    <td className="h-full min-h-16 items-center flex lg:flex-row flex-col px-2 space-y-2 space-x-2 py-2 text-sm text-gray-600 justify-center">
                       {typeof customActionRenderer === "function"
                         ? customActionRenderer(record)
                         : cloneElement(customActionRenderer, { record })}
