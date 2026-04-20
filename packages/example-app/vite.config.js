@@ -15,12 +15,6 @@ export default defineConfig({
     preserveSymlinks: true,
 
     alias: {
-      "ynotsoft-dynamic-form": path.resolve(
-        __dirname,
-        "..",
-        "dynamic-form-lib",
-        "src",
-      ),
       "ynotsoft-dynamic-grid": path.resolve(
         __dirname,
         "..",
@@ -36,7 +30,7 @@ export default defineConfig({
       allow: [
         ".", // project root
         "..", // parent folder
-        "../ynotsoft-dynamic-form",
+        "../ynotsoft-dynamic-grid",
       ],
     },
   },
