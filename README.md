@@ -1,4 +1,100 @@
-## Dynamic Grid for React
+
+# Dynamic Grid Component - Complete Field Reference
+
+## Install and Development Setup (Bun Monorepo)
+
+This project uses **Node** as the package manager and **Vite** with custom path aliasing for Hot Module Replacement (HMR) in the monorepo workspace.
+
+### 1\. Prerequisites
+
+You **must** have **node v22 or higher** (v24 recommended) installed to manage dependencies and run development scripts.  
+
+> Can now use npm instead of bun </br>
+> node ^v22.7.0 required
+
+### 2\. Install Dependencies
+
+From the root of the repository (`dynamic-grid/`):
+
+```bash
+# Install all dependencies and create workspace symlinks using npm
+npm install
+```
+
+### 3\. Build the Library (Initial Setup)
+
+Because the library's `package.json` entry points point to files in the `/dist` directory, you must run an initial build so the example app can resolve the dependency.
+
+From the root of the repository:
+
+```bash
+npm run build    #runs: npm run dev -w ynotsoft-dynamic-grid
+```
+
+
+### 4\. Start the Example App
+
+Run the development server for the example application.
+
+From the root of the repository:
+
+```bash
+npm run example  #runs: npm run dev -w example
+```
+
+> **IMPORTANT NOTE ON HMR (Hot Module Replacement):**
+> If HMR fails for changes made in the `packages/dynamic-grid-lib/` source code, ensure your `example-app/vite.config.js` has the necessary **Path Aliasing** configured to bypass the symlink watcher issue. This is configured to resolve HMR issues and is essential for local development.
+
+### 5\. How to push changes
+
+#### For Regular Development Changes:
+
+```bash
+# 1. Commit your changes
+git add .
+git commit -m "feat: your change description"
+
+# 2. Create tag
+git tag v1.0.[version-number]
+```
+
+#### For NPM Package Releases:
+
+```bash
+# 1. Update version in package.json (in packages/dynamic-grid-lib/)
+npm version patch   # for bug fixes (1.0.0 → 1.0.1)
+
+# 2. Build the library from root of the project
+npm run build
+
+# 3. Git commit and push to branch main
+
+# 4. GitHub Actions will automatically publish to NPM
+```
+
+#### Version Management:
+
+- **Single Source of Truth:** Version is maintained in `packages/dynamic-grid-lib/package.json`
+- **Git Tags:** Use format `v1.0.[version-number]` (matches package.json version with "v" prefix)
+- **NPM Registry:** GitHub Actions reads git tag, strips "v" prefix, publishes as `1.0.[version-number]` to NPM
+- **Auto-Sync:** Git tag version must match package.json version for successful deployment
+
+**Quick Check:**
+
+```bash
+# Verify versions match before pushing
+cat packages/dynamic-grid-lib/package.json | grep version
+git tag --list | tail -1
+```
+
+> **Note:** The GitHub Actions workflow automatically publishes to NPM when you push a version tag (e.g., `v1.0.[version-number]`). No manual `npm publish` required unless you are not logged into NPM already.
+
+---
+
+
+
+
+
 
 A lightweight, data-driven grid for React with built‑in filtering, sorting, pagination, exporting, and row selection. It renders from your API response (headers + records) and gives you slots to add actions and custom tools.
 
