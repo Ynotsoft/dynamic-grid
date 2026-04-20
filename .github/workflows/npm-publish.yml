@@ -1,166 +1,70 @@
-name: Publish ynotsoft-dynamic-grid
+
+name: Publish Grid Library
 
 on:
-  release:
-    types: [published]
-
   push:
-    tags:
-      - "v*"
-
+    branches:
+      - main
+    paths:
+      - "packages/dynamic-grid-lib/**"
   workflow_dispatch:
     inputs:
-      version:
-        description: "Version to publish (e.g. v1.0.11 or v1.0.11-rc.1)"
-        required: true
-      dist_tag:
-        description: "npm dist-tag (latest/next/beta/alpha). Leave blank for auto."
+      reason:
+        description: "Reason for manual trigger (optional)"
         required: false
-        default: ""
+        default: "Manual retry"
 
 permissions:
   contents: read
+  id-token: write
 
 jobs:
-  build:
-    name: Build (Vite)
+  publish-grid:
     runs-on: ubuntu-latest
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
-
+    env:
+      PKG_DIR: "packages/dynamic-grid-lib"
+      PKG_NAME: "ynotsoft-dynamic-grid"
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
         with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-          cache: npm
+          node-version: '20'
+
+      - name: Set up .npmrc
+        run: echo "//registry.npmjs.org/:_authToken=${NODE_AUTH_TOKEN}" > .npmrc
 
       - name: Install dependencies
+        # Switched to install to avoid the package-lock requirement error
+        run: npm install 
+
+      - name: Build Library
+        run: npm run build --workspace=${{ env.PKG_NAME }}
+
+      - name: Determine Version and Tag
+        id: info
         run: |
-          rm -f package-lock.json
-          npm install --no-audit --no-fund
+          VER=$(node -p "require('./${{ env.PKG_DIR }}/package.json').version")
+          NAME=$(node -p "require('./${{ env.PKG_DIR }}/package.json').name")
+          
+          if [[ "$VER" == *-* ]]; then TAG="next"; else TAG="latest"; fi
+          
+          echo "version=$VER" >> "$GITHUB_OUTPUT"
+          echo "name=$NAME" >> "$GITHUB_OUTPUT"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-      - name: Build library (Vite)
-        run: npm run build
-
-      - name: Verify dist files
+      - name: Validate Version Bump
         run: |
-          test -f dist/dynamic-grid.js
-          test -f dist/dynamic-grid.umd.cjs
-
-      - name: Upload dist artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: grid-dist
-          path: |
-            dist
-            package.json
-            README.md
-
-  publish:
-    name: Publish to npm
-    runs-on: ubuntu-latest
-    needs: build
-    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
-
-    permissions:
-      contents: read
-      id-token: write
-
-    env:
-      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          registry-url: https://registry.npmjs.org/
-
-      - name: Download dist artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: grid-dist
-          path: .
-
-      - name: Guard package name
-        id: pkg
-        run: |
-          NAME=$(node -p "require('./package.json').name")
-          echo "Package name: $NAME"
-          if [ "$NAME" != "ynotsoft-dynamic-grid" ]; then
-            echo "::error::package.json 'name' must be 'ynotsoft-dynamic-grid'"
+          PKG="${{ steps.info.outputs.name }}"
+          VER="${{ steps.info.outputs.version }}"
+          
+          if npm view "$PKG@$VER" version >/dev/null 2>&1; then
+            echo "::error::Version $VER of $PKG already exists on NPM. Update the version in ${{ env.PKG_DIR }}/package.json and push again."
             exit 1
           fi
-          echo "name=$NAME" >> "$GITHUB_OUTPUT"
 
-      - name: Derive version
-        id: ver
+      - name: Publish to npm
         run: |
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            RAW="${{ github.event.inputs.version }}"
-          else
-            RAW="${GITHUB_REF_NAME}"
-          fi
-          VERSION="${RAW#v}"
-          echo "Publishing version $VERSION"
-          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
-
-      - name: Ensure repository URL for provenance
-        env:
-          REPO_URL: "${{ github.server_url }}/${{ github.repository }}"
-        run: |
-          echo "Setting repository.url to $REPO_URL"
-          node <<EOF
-          const fs = require('fs');
-          const pkg = JSON.parse(fs.readFileSync('package.json', 'utf8'));
-          pkg.repository = { type: 'git', url: process.env.REPO_URL };
-          fs.writeFileSync('package.json', JSON.stringify(pkg, null, 2));
-          EOF
-
-      - name: Update version if needed
-        run: |
-          TARGET="${{ steps.ver.outputs.version }}"
-          CURRENT=$(node -p "require('./package.json').version")
-          echo "Current=$CURRENT Target=$TARGET"
-          if [ "$CURRENT" != "$TARGET" ]; then
-            npm version "$TARGET" --no-git-tag-version
-          fi
-
-      - name: Determine npm dist-tag
-        id: tag
-        run: |
-          INPUT="${{ github.event.inputs.dist_tag }}"
-          if [ -n "$INPUT" ]; then
-            echo "tag=$INPUT" >> "$GITHUB_OUTPUT"
-            exit 0
-          fi
-          VER="${{ steps.ver.outputs.version }}"
-          if [[ "$VER" == *-* ]]; then
-            echo "tag=next" >> "$GITHUB_OUTPUT"
-          else
-            echo "tag=latest" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Check if version already exists on npm
-        id: exists
-        run: |
-          PKG="${{ steps.pkg.outputs.name }}"
-          VER="${{ steps.ver.outputs.version }}"
-          if npm view "$PKG@$VER" version >/dev/null 2>&1; then
-            echo "exists=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "exists=false" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Publish to npm (if new)
-        if: steps.exists.outputs.exists == 'false'
-        run: |
-          npm publish --access public --provenance --tag "${{ steps.tag.outputs.tag }}"
-
-      - name: Promote dist-tag (if already published)
-        if: steps.exists.outputs.exists == 'true'
-        run: |
-          npm dist-tag add "${{ steps.pkg.outputs.name }}@${{ steps.ver.outputs.version }}" "${{ steps.tag.outputs.tag }}"
+          npm publish ./${{ env.PKG_DIR }} --access public --provenance --tag "${{ steps.info.outputs.tag }}"
