@@ -16,7 +16,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/Ynotsoft/dynamic-form"
+    "url": "git+https://github.com/Ynotsoft/dynamic-grid.git",
+    "directory": "packages/dynamic-grid-lib"
+  },
+  "publishConfig": {
+    "access": "public"
   },
   "files": [
     "dist",
